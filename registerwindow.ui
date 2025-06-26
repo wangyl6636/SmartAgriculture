@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>RegisterWindow</class>
+ <widget class="QMainWindow" name="RegisterWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>智慧农业登录</string>
+   <string>智慧农业注册</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="centralLayout">
@@ -29,16 +29,16 @@
      </spacer>
     </item>
     <item>
-     <widget class="QFrame" name="loginFrame">
+     <widget class="QFrame" name="registerFrame">
       <property name="minimumSize">
        <size>
         <width>360</width>
-        <height>340</height>
+        <height>380</height>
        </size>
       </property>
       <property name="styleSheet">
        <string notr="true">
-        QFrame#loginFrame {
+        QFrame#registerFrame {
             background: #fff;
             border-radius: 16px;
             border: 1px solid #e0e0e0;
@@ -51,7 +51,7 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <layout class="QVBoxLayout" name="loginLayout">
+      <layout class="QVBoxLayout" name="registerLayout">
        <item>
         <widget class="QLabel" name="labelTitle">
          <property name="minimumSize">
@@ -70,12 +70,12 @@
           <string notr="true">
            font-size: 26px;
            font-weight: bold;
-           color: #2e7d32;
+           color: #1976d2;
            margin-bottom: 18px;
           </string>
          </property>
          <property name="text">
-          <string>智慧农业平台</string>
+          <string>用户注册</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -181,27 +181,33 @@
            <string>专家</string>
           </property>
          </item>
-         <item>
-          <property name="text">
-           <string>管理员</string>
-          </property>
-         </item>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButtonLogin">
+        <widget class="QLabel" name="labelField">
          <property name="styleSheet">
-          <string notr="true">
-           background-color: #388e3c;
-           color: #fff;
-           border-radius: 6px;
-           font-size: 16px;
-           font-weight: bold;
-           margin-top: 12px;
-          </string>
+          <string notr="true">font-size: 15px; color: #555;</string>
          </property>
          <property name="text">
-          <string>登录</string>
+          <string>领域（仅专家填写）</string>
+         </property>
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditField">
+         <property name="styleSheet">
+          <string notr="true">
+           border: 1px solid #bdbdbd;
+           border-radius: 6px;
+           padding-left: 8px;
+           font-size: 15px;
+          </string>
+         </property>
+         <property name="visible">
+          <bool>false</bool>
          </property>
         </widget>
        </item>
@@ -214,28 +220,11 @@
            border-radius: 6px;
            font-size: 16px;
            font-weight: bold;
-           margin-top: 8px;
+           margin-top: 12px;
           </string>
          </property>
          <property name="text">
           <string>注册</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonSwitchMode">
-         <property name="styleSheet">
-          <string notr="true">
-           background: transparent;
-           color: #1976d2;
-           border: none;
-           font-size: 14px;
-           margin-top: 4px;
-           text-decoration: underline;
-          </string>
-         </property>
-         <property name="text">
-          <string>没有账号？注册</string>
          </property>
         </widget>
        </item>
@@ -267,6 +256,11 @@
     </rect>
    </property>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
