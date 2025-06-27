@@ -6,6 +6,9 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QString>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 
 DataBaseManager::DataBaseManager() {
     InitDataBase();
@@ -16,9 +19,13 @@ DataBaseManager::~DataBaseManager() {
 }
 
 bool DataBaseManager::InitDataBase() {
-    QString dsn = QString("DRIVER=MySQL ODBC 9.3 Unicode Driver;SERVER=rm-2ze58122pu228651soo.mysql.rds.aliyuncs.com;DATABASE=SAdb;USER=dashuai;PASSWORD=DaShuai123456;OPTION=3;");
-    db = QSqlDatabase::addDatabase("QODBC");
-    db.setDatabaseName(dsn);
+    if (QSqlDatabase::contains("smartagri_connection")) {
+        db = QSqlDatabase::database("smartagri_connection");
+    } else {
+        db = QSqlDatabase::addDatabase("QODBC", "smartagri_connection");
+        QString dsn = QString("DRIVER=MySQL ODBC 9.3 Unicode Driver;SERVER=rm-2ze58122pu228651soo.mysql.rds.aliyuncs.com;DATABASE=SAdb;USER=dashuai;PASSWORD=DaShuai123456;OPTION=3;");
+        db.setDatabaseName(dsn);
+    }
     if (db.open()) {
         qDebug("successful connect!");
         return true;
@@ -32,40 +39,49 @@ bool DataBaseManager::IsOpen() const {
     return db.isOpen();
 }
 
-// ÓÃ»§Ïà¹Ø
-bool DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role) {
+// ç”¨æˆ·ç›¸å…³
+// æ–°å¢žï¼šè¿”å›žé”™è¯¯ä¿¡æ¯çš„AddUser
+bool DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role, QString* errorOut) {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO user (name, phone, password, role) VALUES (?, ?, ?, ?)");
-    query.addBindValue(name);
-    query.addBindValue(phone);
-    query.addBindValue(password);
-    query.addBindValue(role);
-    return query.exec();
+    query.prepare("INSERT INTO users (name, phone, passwd, role) VALUES (:name, :phone, :passwd, :role)");
+    query.bindValue(":name", name);
+    query.bindValue(":phone", phone);
+    query.bindValue(":passwd", password);
+    query.bindValue(":role", role);
+    bool ok = query.exec();
+    if (!ok && errorOut) {
+        *errorOut = query.lastError().text();
+    }
+    return ok;
+}
+// å…¼å®¹åŽŸæœ‰æŽ¥å£
+bool DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role) {
+    return AddUser(name, phone, password, role, nullptr);
 }
 
 bool DataBaseManager::UpdateUser(int userId, const QString& name, const QString& phone, const QString& password, const QString& role) {
     QSqlQuery query(db);
-    query.prepare("UPDATE user SET name=?, phone=?, password=?, role=? WHERE id=?");
-    query.addBindValue(name);
-    query.addBindValue(phone);
-    query.addBindValue(password);
-    query.addBindValue(role);
-    query.addBindValue(userId);
+    query.prepare("UPDATE users SET name=:name, phone=:phone, passwd=:passwd, role=:role WHERE id=:id");
+    query.bindValue(":name", name);
+    query.bindValue(":phone", phone);
+    query.bindValue(":passwd", password);
+    query.bindValue(":role", role);
+    query.bindValue(":id", userId);
     return query.exec();
 }
 
 bool DataBaseManager::DeleteUser(int userId) {
     QSqlQuery query(db);
-    query.prepare("DELETE FROM user WHERE id=?");
-    query.addBindValue(userId);
+    query.prepare("DELETE FROM users WHERE id=:id");
+    query.bindValue(":id", userId);
     return query.exec();
 }
 
 bool DataBaseManager::CheckUserLogin(const QString& phone, const QString& password, QString& role) {
     QSqlQuery query(db);
-    query.prepare("SELECT role FROM user WHERE phone=? AND password=?");
-    query.addBindValue(phone);
-    query.addBindValue(password);
+    query.prepare("SELECT role FROM users WHERE phone=:phone AND passwd=:passwd");
+    query.bindValue(":phone", phone);
+    query.bindValue(":passwd", password);
     if (query.exec() && query.next()) {
         role = query.value(0).toString();
         return true;
@@ -73,11 +89,21 @@ bool DataBaseManager::CheckUserLogin(const QString& phone, const QString& passwo
     return false;
 }
 
+bool DataBaseManager::IsUserExists(const QString& phone){
+    QSqlQuery query(db);
+    query.prepare("SELECT COUNT(*) FROM users WHERE phone=:phone");
+    query.bindValue(":phone", phone);
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt() > 0;
+    }
+    return false;
+}
+
 QVariantList DataBaseManager::GetUserInfo(int userId) {
     QVariantList result;
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM user WHERE id=?");
-    query.addBindValue(userId);
+    query.prepare("SELECT * FROM users WHERE id=:id");
+    query.bindValue(":id", userId);
     if (query.exec() && query.next()) {
         for (int i = 0; i < query.record().count(); ++i)
             result << query.value(i);
@@ -88,7 +114,7 @@ QVariantList DataBaseManager::GetUserInfo(int userId) {
 QVariantList DataBaseManager::GetAllUsers() {
     QVariantList result;
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM user");
+    query.prepare("SELECT * FROM users");
     if (query.exec()) {
         while (query.next()) {
             QVariantList row;
@@ -100,7 +126,7 @@ QVariantList DataBaseManager::GetAllUsers() {
     return result;
 }
 
-// ×÷ÎïÇøÏà¹Ø
+// ä½œç‰©åŒºç›¸å…³
 bool DataBaseManager::AddCropArea(int farmerId, const QString& cropType, float area, const QString& location, const QString& detail) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO crop_area (farmer_id, crop_type, area, location, detail) VALUES (?, ?, ?, ?, ?)");
@@ -161,7 +187,7 @@ QVariantList DataBaseManager::GetAllCropAreas() {
     return result;
 }
 
-// ÏµÍ³½¨ÒéÏà¹Ø
+// ç³»ç»Ÿå»ºè®®ç›¸å…³
 bool DataBaseManager::AddSystemAdvice(int sensorId, int cropAreaId, const QString& fertilizerAdvice, const QString& irrigationAdvice) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO system_advice (sensor_id, crop_area_id, fertilizer_advice, irrigation_advice) VALUES (?, ?, ?, ?)");
@@ -219,7 +245,7 @@ QVariantList DataBaseManager::GetAllSystemAdvices() {
     return result;
 }
 
-// ×¨¼Ò½¨ÒéÏà¹Ø
+// ä¸“å®¶å»ºè®®ç›¸å…³
 bool DataBaseManager::AddExpertAdvice(int expertId, int cropAreaId, const QString& content) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO expert_advice (expert_id, crop_area_id, content) VALUES (?, ?, ?)");
@@ -275,7 +301,7 @@ QVariantList DataBaseManager::GetAllExpertAdvices() {
     return result;
 }
 
-// Ä£ÐÍÓÅ»¯½¨ÒéÏà¹Ø
+// æ¨¡åž‹ä¼˜åŒ–å»ºè®®ç›¸å…³
 bool DataBaseManager::AddModelOptimization(int systemAdviceId, int farmerId, int expertId, const QString& content) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO model_optimization (system_advice_id, farmer_id, expert_id, content) VALUES (?, ?, ?, ?)");
@@ -332,7 +358,7 @@ QVariantList DataBaseManager::GetAllModelOptimizations() {
     return result;
 }
 
-// µ¥ÀýÊµÏÖ
+// å•ä¾‹å®žçŽ°
 DataBaseManager& DataBaseManager::instance() {
     static DataBaseManager instance;
     return instance;
@@ -341,7 +367,7 @@ DataBaseManager& DataBaseManager::instance() {
 void DataBaseManager::TestPrintAllSensors() {
     QSqlQuery query(db);
     if (!query.exec("SELECT * FROM sensor")) {
-        qDebug() << "²éÑ¯´«¸ÐÆ÷Êý¾ÝÊ§°Ü:" << query.lastError().text();
+        qDebug() << "æŸ¥è¯¢ä¼ æ„Ÿå™¨æ•°æ®å¤±è´¥:" << query.lastError().text();
         return;
     }
     while (query.next()) {
@@ -351,4 +377,33 @@ void DataBaseManager::TestPrintAllSensors() {
         }
         qDebug() << row.join(", ");
     }
+}
+
+QVariantList DataBaseManager::GetSensorInfo(int sensorId) {
+    QVariantList result;
+    QSqlQuery query(db);
+    query.prepare("SELECT id, resource, event, content, event_time, receive_time FROM sensor WHERE id=:id");
+    query.bindValue(":id", sensorId);
+    if (query.exec() && query.next()) {
+        for (int i = 0; i < query.record().count(); ++i) {
+            // contentå­—æ®µç›´æŽ¥è¿”å›žå­—ç¬¦ä¸²ï¼Œäº¤ç”±ä¸Šå±‚è§£æžJSON
+            result << query.value(i);
+        }
+    }
+    return result;
+}
+
+QVariantList DataBaseManager::GetAllSensors() {
+    QVariantList result;
+    QSqlQuery query(db);
+    query.prepare("SELECT id, resource, event, content, event_time, receive_time FROM sensor");
+    if (query.exec()) {
+        while (query.next()) {
+            QVariantList row;
+            for (int i = 0; i < query.record().count(); ++i)
+                row << query.value(i);
+            result << QVariant(row);
+        }
+    }
+    return result;
 }

@@ -127,6 +127,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="labelPhoneTip">
+         <property name="text">
+          <string>text</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="labelPassword">
          <property name="styleSheet">
           <string notr="true">font-size: 15px; color: #555;</string>
@@ -185,19 +192,22 @@
        </item>
        <item>
         <widget class="QLabel" name="labelField">
+         <property name="visible">
+          <bool>false</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true">font-size: 15px; color: #555;</string>
          </property>
          <property name="text">
           <string>领域（仅专家填写）</string>
          </property>
-         <property name="visible">
-          <bool>false</bool>
-         </property>
         </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="lineEditField">
+         <property name="visible">
+          <bool>false</bool>
+         </property>
          <property name="styleSheet">
           <string notr="true">
            border: 1px solid #bdbdbd;
@@ -206,21 +216,22 @@
            font-size: 15px;
           </string>
          </property>
-         <property name="visible">
-          <bool>false</bool>
-         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushButtonRegister">
          <property name="styleSheet">
-          <string notr="true">
-           background-color: #1976d2;
-           color: #fff;
-           border-radius: 6px;
-           font-size: 16px;
-           font-weight: bold;
-           margin-top: 12px;
+          <string notr="true">QPushButton {
+    background-color: #1976d2;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+}
+QPushButton:hover {
+    background-color: #1565c0; /* 悬停时变深 */
+    border: 2px solid #42a5f5; /* 悬停时加边框 */
+}
           </string>
          </property>
          <property name="text">
@@ -256,11 +267,6 @@
     </rect>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
- </widget>
- <resources/>
- <connections/>
-</ui>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
