@@ -19,7 +19,7 @@ public:
     bool AddUser(const QString& name, const QString& phone, const QString& password, const QString& role, QString* errorOut); // 添加用户（带错误信息）
     bool UpdateUser(int userId, const QString& name, const QString& phone, const QString& password, const QString& role); // 更新用户信息
     bool DeleteUser(int userId); // 删除用户
-    bool CheckUserLogin(const QString& phone, const QString& password, QString& role); // 检查用户登录
+    bool CheckUserLogin(const QString& name, const QString& phone, const QString& password, QString& role); // 检查用户登录
     bool IsUserExists(const QString& phone); // 检查用户是否存在
     QVariantList GetUserInfo(int userId); // 获取指定用户信息
     QVariantList GetAllUsers(); // 获取所有用户信息

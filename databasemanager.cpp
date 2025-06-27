@@ -10,9 +10,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 
-DataBaseManager::DataBaseManager() {
-    InitDataBase();
-}
+DataBaseManager::DataBaseManager() {}
 
 DataBaseManager::~DataBaseManager() {
     if (db.isOpen()) db.close();
@@ -40,7 +38,6 @@ bool DataBaseManager::IsOpen() const {
 }
 
 // 用户相关
-// 新增：返回错误信息的AddUser
 bool DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role, QString* errorOut) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO users (name, phone, passwd, role) VALUES (:name, :phone, :passwd, :role)");
@@ -77,9 +74,10 @@ bool DataBaseManager::DeleteUser(int userId) {
     return query.exec();
 }
 
-bool DataBaseManager::CheckUserLogin(const QString& phone, const QString& password, QString& role) {
+bool DataBaseManager::CheckUserLogin(const QString& name, const QString& phone, const QString& password, QString& role) {
     QSqlQuery query(db);
-    query.prepare("SELECT role FROM users WHERE phone=:phone AND passwd=:passwd");
+    query.prepare("SELECT role FROM users WHERE name=:name AND phone=:phone AND passwd=:passwd");
+    query.bindValue(":name", name);
     query.bindValue(":phone", phone);
     query.bindValue(":passwd", password);
     if (query.exec() && query.next()) {

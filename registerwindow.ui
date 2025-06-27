@@ -129,7 +129,7 @@
        <item>
         <widget class="QLabel" name="labelPhoneTip">
          <property name="text">
-          <string>text</string>
+          <string>TextLabel</string>
          </property>
         </widget>
        </item>
@@ -221,17 +221,13 @@
        <item>
         <widget class="QPushButton" name="pushButtonRegister">
          <property name="styleSheet">
-          <string notr="true">QPushButton {
-    background-color: #1976d2;
-    color: #fff;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: bold;
-}
-QPushButton:hover {
-    background-color: #1565c0; /* 悬停时变深 */
-    border: 2px solid #42a5f5; /* 悬停时加边框 */
-}
+          <string notr="true">
+           background-color: #1976d2;
+           color: #fff;
+           border-radius: 6px;
+           font-size: 16px;
+           font-weight: bold;
+           margin-top: 12px;
           </string>
          </property>
          <property name="text">

@@ -53,6 +53,7 @@ void RegisterWindow::on_pushButtonRegister_clicked()
 {
     if(!islegal){
         QMessageBox::critical(this, "错误", "手机号格式不正确，请重新输入！");
+        return;
     }
 
     DataBaseManager &db=DataBaseManager::instance();
@@ -101,3 +102,15 @@ void RegisterWindow::closeEvent(QCloseEvent *event)
     emit closedSignal();
     QMainWindow::closeEvent(event);
 }
+
+void RegisterWindow::on_comboBoxRole_activated(int index)
+{
+    if(index==1){
+        ui->labelField->setVisible(true);
+        ui->lineEditField->setVisible(true);
+    }else{
+        ui->labelField->setVisible(false);
+        ui->lineEditField->setVisible(false);
+    }
+}
+

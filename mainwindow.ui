@@ -191,14 +191,17 @@
        <item>
         <widget class="QPushButton" name="pushButtonLogin">
          <property name="styleSheet">
-          <string notr="true">
-           background-color: #388e3c;
-           color: #fff;
-           border-radius: 6px;
-           font-size: 16px;
-           font-weight: bold;
-           margin-top: 12px;
-          </string>
+          <string notr="true">QPushButton {
+  background-color: #43a047;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+}
+QPushButton:hover {
+  background-color: #388e3c;
+  border: 2px solid #66bb6a;
+}</string>
          </property>
          <property name="text">
           <string>登录</string>
@@ -208,14 +211,17 @@
        <item>
         <widget class="QPushButton" name="pushButtonRegister">
          <property name="styleSheet">
-          <string notr="true">
-           background-color: #1976d2;
-           color: #fff;
-           border-radius: 6px;
-           font-size: 16px;
-           font-weight: bold;
-           margin-top: 8px;
-          </string>
+          <string notr="true">QPushButton {
+  background-color: #1976d2;
+  color: #fff;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+}
+QPushButton:hover {
+  background-color: #1565c0;
+  border: 2px solid #42a5f5;
+}</string>
          </property>
          <property name="text">
           <string>注册</string>
@@ -225,14 +231,18 @@
        <item>
         <widget class="QPushButton" name="pushButtonSwitchMode">
          <property name="styleSheet">
-          <string notr="true">
-           background: transparent;
-           color: #1976d2;
-           border: none;
-           font-size: 14px;
-           margin-top: 4px;
-           text-decoration: underline;
-          </string>
+          <string notr="true">QPushButton {
+  background: transparent;
+  color: #1976d2;
+  border: none;
+  font-size: 15px;
+  text-decoration: underline;
+  font-weight: bold;
+}
+QPushButton:hover {
+  color: #0d47a1;
+  text-decoration: underline;
+}</string>
          </property>
          <property name="text">
           <string>没有账号？注册</string>

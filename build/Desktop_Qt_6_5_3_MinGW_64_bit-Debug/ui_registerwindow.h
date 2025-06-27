@@ -188,17 +188,13 @@ public:
 
         pushButtonRegister = new QPushButton(registerFrame);
         pushButtonRegister->setObjectName("pushButtonRegister");
-        pushButtonRegister->setStyleSheet(QString::fromUtf8("QPushButton {\n"
-"    background-color: #1976d2;\n"
-"    color: #fff;\n"
-"    border-radius: 6px;\n"
-"    font-size: 16px;\n"
-"    font-weight: bold;\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: #1565c0; /* \346\202\254\345\201\234\346\227\266\345\217\230\346\267\261 */\n"
-"    border: 2px solid #42a5f5; /* \346\202\254\345\201\234\346\227\266\345\212\240\350\276\271\346\241\206 */\n"
-"}\n"
+        pushButtonRegister->setStyleSheet(QString::fromUtf8("\n"
+"           background-color: #1976d2;\n"
+"           color: #fff;\n"
+"           border-radius: 6px;\n"
+"           font-size: 16px;\n"
+"           font-weight: bold;\n"
+"           margin-top: 12px;\n"
 "          "));
 
         registerLayout->addWidget(pushButtonRegister);
@@ -230,7 +226,7 @@ public:
         labelTitle->setText(QCoreApplication::translate("RegisterWindow", "\347\224\250\346\210\267\346\263\250\345\206\214", nullptr));
         labelName->setText(QCoreApplication::translate("RegisterWindow", "\345\247\223\345\220\215", nullptr));
         labelPhone->setText(QCoreApplication::translate("RegisterWindow", "\346\211\213\346\234\272\345\217\267", nullptr));
-        labelPhoneTip->setText(QCoreApplication::translate("RegisterWindow", "text", nullptr));
+        labelPhoneTip->setText(QCoreApplication::translate("RegisterWindow", "TextLabel", nullptr));
         labelPassword->setText(QCoreApplication::translate("RegisterWindow", "\345\257\206\347\240\201", nullptr));
         labelRole->setText(QCoreApplication::translate("RegisterWindow", "\350\247\222\350\211\262", nullptr));
         comboBoxRole->setItemText(0, QCoreApplication::translate("RegisterWindow", "\345\206\234\346\210\267", nullptr));

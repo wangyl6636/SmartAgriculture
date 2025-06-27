@@ -164,40 +164,50 @@ public:
 
         pushButtonLogin = new QPushButton(loginFrame);
         pushButtonLogin->setObjectName("pushButtonLogin");
-        pushButtonLogin->setStyleSheet(QString::fromUtf8("\n"
-"           background-color: #388e3c;\n"
-"           color: #fff;\n"
-"           border-radius: 6px;\n"
-"           font-size: 16px;\n"
-"           font-weight: bold;\n"
-"           margin-top: 12px;\n"
-"          "));
+        pushButtonLogin->setStyleSheet(QString::fromUtf8("QPushButton {\n"
+"  background-color: #43a047;\n"
+"  color: #fff;\n"
+"  border-radius: 6px;\n"
+"  font-size: 16px;\n"
+"  font-weight: bold;\n"
+"}\n"
+"QPushButton:hover {\n"
+"  background-color: #388e3c;\n"
+"  border: 2px solid #66bb6a;\n"
+"}"));
 
         loginLayout->addWidget(pushButtonLogin);
 
         pushButtonRegister = new QPushButton(loginFrame);
         pushButtonRegister->setObjectName("pushButtonRegister");
-        pushButtonRegister->setStyleSheet(QString::fromUtf8("\n"
-"           background-color: #1976d2;\n"
-"           color: #fff;\n"
-"           border-radius: 6px;\n"
-"           font-size: 16px;\n"
-"           font-weight: bold;\n"
-"           margin-top: 8px;\n"
-"          "));
+        pushButtonRegister->setStyleSheet(QString::fromUtf8("QPushButton {\n"
+"  background-color: #1976d2;\n"
+"  color: #fff;\n"
+"  border-radius: 6px;\n"
+"  font-size: 16px;\n"
+"  font-weight: bold;\n"
+"}\n"
+"QPushButton:hover {\n"
+"  background-color: #1565c0;\n"
+"  border: 2px solid #42a5f5;\n"
+"}"));
 
         loginLayout->addWidget(pushButtonRegister);
 
         pushButtonSwitchMode = new QPushButton(loginFrame);
         pushButtonSwitchMode->setObjectName("pushButtonSwitchMode");
-        pushButtonSwitchMode->setStyleSheet(QString::fromUtf8("\n"
-"           background: transparent;\n"
-"           color: #1976d2;\n"
-"           border: none;\n"
-"           font-size: 14px;\n"
-"           margin-top: 4px;\n"
-"           text-decoration: underline;\n"
-"          "));
+        pushButtonSwitchMode->setStyleSheet(QString::fromUtf8("QPushButton {\n"
+"  background: transparent;\n"
+"  color: #1976d2;\n"
+"  border: none;\n"
+"  font-size: 15px;\n"
+"  text-decoration: underline;\n"
+"  font-weight: bold;\n"
+"}\n"
+"QPushButton:hover {\n"
+"  color: #0d47a1;\n"
+"  text-decoration: underline;\n"
+"}"));
 
         loginLayout->addWidget(pushButtonSwitchMode);
 
