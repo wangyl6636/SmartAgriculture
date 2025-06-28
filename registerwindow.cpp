@@ -108,9 +108,27 @@ void RegisterWindow::on_comboBoxRole_activated(int index)
     if(index==1){
         ui->labelField->setVisible(true);
         ui->lineEditField->setVisible(true);
+
+        ui->labelCropType->setVisible(false);
+        ui->lineEditCropType->setVisible(false);
+        ui->labelArea->setVisible(false);
+        ui->lineEditArea->setVisible(false);
+        ui->labelLocation->setVisible(false);
+        ui->lineEditLocation->setVisible(false);
+        ui->labelDetail->setVisible(false);
+        ui->lineEditDetail->setVisible(false);
     }else{
         ui->labelField->setVisible(false);
         ui->lineEditField->setVisible(false);
+
+        ui->labelCropType->setVisible(true);
+        ui->lineEditCropType->setVisible(true);
+        ui->labelArea->setVisible(true);
+        ui->lineEditArea->setVisible(true);
+        ui->labelLocation->setVisible(true);
+        ui->lineEditLocation->setVisible(true);
+        ui->labelDetail->setVisible(true);
+        ui->lineEditDetail->setVisible(true);
     }
 }
 

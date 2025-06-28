@@ -43,6 +43,14 @@ public:
     QLineEdit *lineEditPassword;
     QLabel *labelRole;
     QComboBox *comboBoxRole;
+    QLabel *labelCropType;
+    QLineEdit *lineEditCropType;
+    QLabel *labelArea;
+    QLineEdit *lineEditArea;
+    QLabel *labelLocation;
+    QLineEdit *lineEditLocation;
+    QLabel *labelDetail;
+    QLineEdit *lineEditDetail;
     QLabel *labelField;
     QLineEdit *lineEditField;
     QPushButton *pushButtonRegister;
@@ -150,7 +158,6 @@ public:
 
         labelRole = new QLabel(registerFrame);
         labelRole->setObjectName("labelRole");
-        labelRole->setStyleSheet(QString::fromUtf8("font-size: 15px; color: #555;"));
 
         registerLayout->addWidget(labelRole);
 
@@ -167,22 +174,63 @@ public:
 
         registerLayout->addWidget(comboBoxRole);
 
+        labelCropType = new QLabel(registerFrame);
+        labelCropType->setObjectName("labelCropType");
+        labelCropType->setVisible(true);
+
+        registerLayout->addWidget(labelCropType);
+
+        lineEditCropType = new QLineEdit(registerFrame);
+        lineEditCropType->setObjectName("lineEditCropType");
+        lineEditCropType->setVisible(true);
+
+        registerLayout->addWidget(lineEditCropType);
+
+        labelArea = new QLabel(registerFrame);
+        labelArea->setObjectName("labelArea");
+        labelArea->setVisible(true);
+
+        registerLayout->addWidget(labelArea);
+
+        lineEditArea = new QLineEdit(registerFrame);
+        lineEditArea->setObjectName("lineEditArea");
+        lineEditArea->setVisible(true);
+
+        registerLayout->addWidget(lineEditArea);
+
+        labelLocation = new QLabel(registerFrame);
+        labelLocation->setObjectName("labelLocation");
+        labelLocation->setVisible(true);
+
+        registerLayout->addWidget(labelLocation);
+
+        lineEditLocation = new QLineEdit(registerFrame);
+        lineEditLocation->setObjectName("lineEditLocation");
+        lineEditLocation->setVisible(true);
+
+        registerLayout->addWidget(lineEditLocation);
+
+        labelDetail = new QLabel(registerFrame);
+        labelDetail->setObjectName("labelDetail");
+        labelDetail->setVisible(true);
+
+        registerLayout->addWidget(labelDetail);
+
+        lineEditDetail = new QLineEdit(registerFrame);
+        lineEditDetail->setObjectName("lineEditDetail");
+        lineEditDetail->setVisible(true);
+
+        registerLayout->addWidget(lineEditDetail);
+
         labelField = new QLabel(registerFrame);
         labelField->setObjectName("labelField");
         labelField->setVisible(false);
-        labelField->setStyleSheet(QString::fromUtf8("font-size: 15px; color: #555;"));
 
         registerLayout->addWidget(labelField);
 
         lineEditField = new QLineEdit(registerFrame);
         lineEditField->setObjectName("lineEditField");
         lineEditField->setVisible(false);
-        lineEditField->setStyleSheet(QString::fromUtf8("\n"
-"           border: 1px solid #bdbdbd;\n"
-"           border-radius: 6px;\n"
-"           padding-left: 8px;\n"
-"           font-size: 15px;\n"
-"          "));
 
         registerLayout->addWidget(lineEditField);
 
@@ -232,7 +280,11 @@ public:
         comboBoxRole->setItemText(0, QCoreApplication::translate("RegisterWindow", "\345\206\234\346\210\267", nullptr));
         comboBoxRole->setItemText(1, QCoreApplication::translate("RegisterWindow", "\344\270\223\345\256\266", nullptr));
 
-        labelField->setText(QCoreApplication::translate("RegisterWindow", "\351\242\206\345\237\237\357\274\210\344\273\205\344\270\223\345\256\266\345\241\253\345\206\231\357\274\211", nullptr));
+        labelCropType->setText(QCoreApplication::translate("RegisterWindow", "\344\275\234\347\211\251\347\261\273\345\236\213", nullptr));
+        labelArea->setText(QCoreApplication::translate("RegisterWindow", "\351\235\242\347\247\257\357\274\210\344\272\251\357\274\211", nullptr));
+        labelLocation->setText(QCoreApplication::translate("RegisterWindow", "\345\234\260\347\202\271", nullptr));
+        labelDetail->setText(QCoreApplication::translate("RegisterWindow", "\350\257\246\346\203\205", nullptr));
+        labelField->setText(QCoreApplication::translate("RegisterWindow", "\346\223\205\351\225\277\351\242\206\345\237\237", nullptr));
         pushButtonRegister->setText(QCoreApplication::translate("RegisterWindow", "\346\263\250\345\206\214", nullptr));
     } // retranslateUi
 

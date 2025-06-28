@@ -161,7 +161,6 @@
        <item>
         <widget class="QLabel" name="labelRole">
          <property name="styleSheet">
-          <string notr="true">font-size: 15px; color: #555;</string>
          </property>
          <property name="text">
           <string>角色</string>
@@ -191,15 +190,80 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="labelCropType">
+         <property name="visible">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>作物类型</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditCropType">
+         <property name="visible">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelArea">
+         <property name="visible">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>面积（亩）</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditArea">
+         <property name="visible">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelLocation">
+         <property name="visible">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>地点</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditLocation">
+         <property name="visible">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelDetail">
+         <property name="visible">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>详情</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditDetail">
+         <property name="visible">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="labelField">
          <property name="visible">
           <bool>false</bool>
          </property>
-         <property name="styleSheet">
-          <string notr="true">font-size: 15px; color: #555;</string>
-         </property>
          <property name="text">
-          <string>领域（仅专家填写）</string>
+          <string>擅长领域</string>
          </property>
         </widget>
        </item>
@@ -207,14 +271,6 @@
         <widget class="QLineEdit" name="lineEditField">
          <property name="visible">
           <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">
-           border: 1px solid #bdbdbd;
-           border-radius: 6px;
-           padding-left: 8px;
-           font-size: 15px;
-          </string>
          </property>
         </widget>
        </item>
