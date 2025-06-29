@@ -15,14 +15,24 @@ public:
     bool IsOpen() const; // 检查数据库是否打开
 
     // 用户相关
-    bool AddUser(const QString& name, const QString& phone, const QString& password, const QString& role); // 添加用户
-    bool AddUser(const QString& name, const QString& phone, const QString& password, const QString& role, QString* errorOut); // 添加用户（带错误信息）
+    int AddUser(const QString& name, const QString& phone, const QString& password, const QString& role); // 添加用户,并返回用户id
+    int AddUser(const QString& name, const QString& phone, const QString& password, const QString& role, QString* errorOut); // 添加用户（带错误信息）
     bool UpdateUser(int userId, const QString& name, const QString& phone, const QString& password, const QString& role); // 更新用户信息
     bool DeleteUser(int userId); // 删除用户
     bool CheckUserLogin(const QString& name, const QString& phone, const QString& password, QString& role); // 检查用户登录
     bool IsUserExists(const QString& phone); // 检查用户是否存在
     QVariantList GetUserInfo(int userId); // 获取指定用户信息
     QVariantList GetAllUsers(); // 获取所有用户信息
+
+    //农户相关
+    int AddFarmerUser(const int userId);
+    bool DeleteFarmerUser(const int farmerId);
+    int GetFarmerId(const int userId);
+
+    //专家相关
+    bool AddExpertUser(const int userId,const QString& field);
+    bool DeleteExpertUser(const int expertId);
+    int GetExpertId(const int experId);
 
     // 作物区相关
     bool AddCropArea(int farmerId, const QString& cropType, float area, const QString& location, const QString& detail); // 添加作物区
@@ -59,7 +69,16 @@ public:
     // 单例获取接口
     static DataBaseManager& instance(); // 获取单例对象
 
-    void TestPrintAllSensors(); // 测试打印所有传感器数据
+    //返回上一条错误信息
+    QString GetLastError() const;
+
+    //保证单次操作的原子性
+    bool BeginTransaction();
+    bool CommitTransaction();
+    bool RollbackTransaction();
+
+    //超时连接检测
+    bool TestConnection();
 
 private:
     QSqlDatabase db;

@@ -47,6 +47,7 @@ public:
     QLineEdit *lineEditCropType;
     QLabel *labelArea;
     QLineEdit *lineEditArea;
+    QLabel *labelAreaTip;
     QLabel *labelLocation;
     QLineEdit *lineEditLocation;
     QLabel *labelDetail;
@@ -198,6 +199,12 @@ public:
 
         registerLayout->addWidget(lineEditArea);
 
+        labelAreaTip = new QLabel(registerFrame);
+        labelAreaTip->setObjectName("labelAreaTip");
+        labelAreaTip->setVisible(true);
+
+        registerLayout->addWidget(labelAreaTip);
+
         labelLocation = new QLabel(registerFrame);
         labelLocation->setObjectName("labelLocation");
         labelLocation->setVisible(true);
@@ -276,12 +283,14 @@ public:
         labelPhone->setText(QCoreApplication::translate("RegisterWindow", "\346\211\213\346\234\272\345\217\267", nullptr));
         labelPhoneTip->setText(QCoreApplication::translate("RegisterWindow", "TextLabel", nullptr));
         labelPassword->setText(QCoreApplication::translate("RegisterWindow", "\345\257\206\347\240\201", nullptr));
+        labelRole->setStyleSheet(QString());
         labelRole->setText(QCoreApplication::translate("RegisterWindow", "\350\247\222\350\211\262", nullptr));
         comboBoxRole->setItemText(0, QCoreApplication::translate("RegisterWindow", "\345\206\234\346\210\267", nullptr));
         comboBoxRole->setItemText(1, QCoreApplication::translate("RegisterWindow", "\344\270\223\345\256\266", nullptr));
 
         labelCropType->setText(QCoreApplication::translate("RegisterWindow", "\344\275\234\347\211\251\347\261\273\345\236\213", nullptr));
         labelArea->setText(QCoreApplication::translate("RegisterWindow", "\351\235\242\347\247\257\357\274\210\344\272\251\357\274\211", nullptr));
+        labelAreaTip->setText(QCoreApplication::translate("RegisterWindow", "TextLabel", nullptr));
         labelLocation->setText(QCoreApplication::translate("RegisterWindow", "\345\234\260\347\202\271", nullptr));
         labelDetail->setText(QCoreApplication::translate("RegisterWindow", "\350\257\246\346\203\205", nullptr));
         labelField->setText(QCoreApplication::translate("RegisterWindow", "\346\223\205\351\225\277\351\242\206\345\237\237", nullptr));

@@ -23,7 +23,6 @@ private:
 private slots:
     void onPhoneTextChanged(const QString &text);
     void on_pushButtonRegister_clicked();
-
     void on_comboBoxRole_activated(int index);
 
 signals:

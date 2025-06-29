@@ -161,6 +161,7 @@
        <item>
         <widget class="QLabel" name="labelRole">
          <property name="styleSheet">
+          <string/>
          </property>
          <property name="text">
           <string>角色</string>
@@ -220,6 +221,16 @@
         <widget class="QLineEdit" name="lineEditArea">
          <property name="visible">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelAreaTip">
+        <property name="visible">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>TextLabel</string>
          </property>
         </widget>
        </item>

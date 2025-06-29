@@ -9,6 +9,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QElapsedTimer>
 
 DataBaseManager::DataBaseManager() {}
 
@@ -34,11 +35,12 @@ bool DataBaseManager::InitDataBase() {
 }
 
 bool DataBaseManager::IsOpen() const {
+    qDebug("检查数据库连接");
     return db.isOpen();
 }
 
 // 用户相关
-bool DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role, QString* errorOut) {
+int DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role, QString* errorOut) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO users (name, phone, passwd, role) VALUES (:name, :phone, :passwd, :role)");
     query.bindValue(":name", name);
@@ -48,12 +50,14 @@ bool DataBaseManager::AddUser(const QString& name, const QString& phone, const Q
     bool ok = query.exec();
     if (!ok && errorOut) {
         *errorOut = query.lastError().text();
+        return -1;
+    }else{
+        return query.lastInsertId().toInt();
     }
-    return ok;
 }
 // 兼容原有接口
-bool DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role) {
-    return AddUser(name, phone, password, role, nullptr);
+int DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role) {
+    return AddUser(name,phone,password,role,nullptr);
 }
 
 bool DataBaseManager::UpdateUser(int userId, const QString& name, const QString& phone, const QString& password, const QString& role) {
@@ -362,20 +366,21 @@ DataBaseManager& DataBaseManager::instance() {
     return instance;
 }
 
-void DataBaseManager::TestPrintAllSensors() {
-    QSqlQuery query(db);
-    if (!query.exec("SELECT * FROM sensor")) {
-        qDebug() << "查询传感器数据失败:" << query.lastError().text();
-        return;
-    }
-    while (query.next()) {
-        QStringList row;
-        for (int i = 0; i < query.record().count(); ++i) {
-            row << query.record().fieldName(i) + "=" + query.value(i).toString();
-        }
-        qDebug() << row.join(", ");
-    }
-}
+//测试函数
+// void DataBaseManager::TestPrintAllSensors() {
+//     QSqlQuery query(db);
+//     if (!query.exec("SELECT * FROM sensor")) {
+//         qDebug() << "查询传感器数据失败:" << query.lastError().text();
+//         return;
+//     }
+//     while (query.next()) {
+//         QStringList row;
+//         for (int i = 0; i < query.record().count(); ++i) {
+//             row << query.record().fieldName(i) + "=" + query.value(i).toString();
+//         }
+//         qDebug() << row.join(", ");
+//     }
+// }
 
 QVariantList DataBaseManager::GetSensorInfo(int sensorId) {
     QVariantList result;
@@ -404,4 +409,110 @@ QVariantList DataBaseManager::GetAllSensors() {
         }
     }
     return result;
+}
+
+
+//农户相关
+int DataBaseManager::AddFarmerUser(const int userId) {
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO farmer (user_id) VALUES (:userId)");
+    query.bindValue(":userId", userId);
+
+    if(query.exec()){
+        return query.lastInsertId().toInt();
+    } else {
+        return -1;
+    }
+}
+
+bool DataBaseManager::DeleteFarmerUser(const int farmerId) {
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM farmer WHERE id=:farmerId");
+    query.bindValue(":farmerId", farmerId);
+
+    bool success = query.exec();
+    return success;  // 返回是否删除成功
+}
+
+int DataBaseManager::GetFarmerId(const int userId) {
+    QSqlQuery query(db);
+    query.prepare("SELECT id FROM farmer WHERE user_id=:userId");
+    query.bindValue(":userId", userId);
+
+    if (query.exec() && query.next()) {
+        int farmerId = query.value(0).toInt();
+        return farmerId;  // 返回对应的 farmerId
+    }
+    return -1;  // 如果没有找到农户信息，返回 -1
+}
+
+//专家相关
+bool DataBaseManager::AddExpertUser(const int userId, const QString& field) {
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO expert (user_id, field) VALUES (:userId, :field)");
+    query.bindValue(":userId", userId);
+    query.bindValue(":field", field);
+
+    return query.exec();
+}
+
+// 删除指定的专家用户
+bool DataBaseManager::DeleteExpertUser(const int expertId) {
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM expert WHERE id=:expertId");
+    query.bindValue(":expertId", expertId);
+
+    bool success = query.exec();
+    return success;  // 返回是否删除成功
+}
+
+// 根据 userId 获取对应的 expertId
+int DataBaseManager::GetExpertId(const int userId) {
+    QSqlQuery query(db);
+    query.prepare("SELECT id FROM expert WHERE user_id=:userId");
+    query.bindValue(":userId", userId);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();  // 返回对应的 expertId
+    }
+    return -1;  // 如果没有找到专家信息，返回 -1
+}
+
+QString DataBaseManager::GetLastError() const {
+    QSqlQuery query(db);
+    if (query.lastError().isValid()) { 
+        return query.lastError().text();
+    }
+    return QString();  // 如果没有错误，返回空字符串
+}
+
+bool DataBaseManager::BeginTransaction() {
+    return db.transaction();
+}
+
+bool DataBaseManager::CommitTransaction() {
+    return db.commit();
+}
+
+bool DataBaseManager::RollbackTransaction() {
+    return db.rollback();
+}
+
+bool DataBaseManager::TestConnection() {
+    QSqlQuery testQuery(db);
+    testQuery.prepare("SELECT 1"); // 执行简单查询测试连接
+
+    QElapsedTimer timer;
+    timer.start();
+
+    if (!testQuery.exec()) {
+        return false; // 查询失败，连接不可用
+    }
+
+    // 检查查询响应时间，避免长时间卡顿
+    if (timer.elapsed() > 2000) { // 2秒超时
+        return false;
+    }
+
+    return testQuery.next() && testQuery.value(0).toInt() == 1;
 }
