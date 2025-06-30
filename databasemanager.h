@@ -23,6 +23,8 @@ public:
     bool IsUserExists(const QString& phone); // 检查用户是否存在
     QVariantList GetUserInfo(int userId); // 获取指定用户信息
     QVariantList GetAllUsers(); // 获取所有用户信息
+    int GetUserIdByPhone(const QString& phone);
+
 
     //农户相关
     int AddFarmerUser(const int userId);
@@ -49,10 +51,11 @@ public:
     QVariantList GetAllSystemAdvices(); // 获取所有系统建议
 
     // 专家建议相关
-    bool AddExpertAdvice(int expertId, int cropAreaId, const QString& content); // 添加专家建议
-    bool UpdateExpertAdvice(int adviceId, const QString& content); // 更新专家建议
+    bool AddExpertAdvice(int expertId, int cropAreaId, const QString& title, const QString& content, const QString& category); // 添加专家建议
+    bool UpdateExpertAdvice(int adviceId, const QString& title, const QString& content, const QString& category); // 更新专家建议
     bool DeleteExpertAdvice(int adviceId); // 删除专家建议
     QVariantList GetExpertAdvices(int cropAreaId); // 获取指定作物区的专家建议
+    QVariantList GetFarmerExpertAdvices(int farmerId);//获取当前农户所有的专家建议
     QVariantList GetAllExpertAdvices(); // 获取所有专家建议
 
     // 模型优化建议相关

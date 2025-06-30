@@ -128,6 +128,18 @@ QVariantList DataBaseManager::GetAllUsers() {
     return result;
 }
 
+int DataBaseManager::GetUserIdByPhone(const QString& phone) {
+    QSqlQuery query(db);
+    query.prepare("SELECT id FROM users WHERE phone=:phone");
+    query.bindValue(":phone", phone);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();  // 返回对应的 userId
+    }
+    return -1;  // 如果没有找到该电话号码的用户，返回 -1
+}
+
+
 // 作物区相关
 bool DataBaseManager::AddCropArea(int farmerId, const QString& cropType, float area, const QString& location, const QString& detail) {
     QSqlQuery query(db);
@@ -248,23 +260,30 @@ QVariantList DataBaseManager::GetAllSystemAdvices() {
 }
 
 // 专家建议相关
-bool DataBaseManager::AddExpertAdvice(int expertId, int cropAreaId, const QString& content) {
+// 添加专家建议
+bool DataBaseManager::AddExpertAdvice(int expertId, int cropAreaId, const QString& title, const QString& content, const QString& category) {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO expert_advice (expert_id, crop_area_id, content) VALUES (?, ?, ?)");
+    query.prepare("INSERT INTO expert_advice (expert_id, crop_area_id, title, content, category) VALUES (?, ?, ?, ?, ?)");
     query.addBindValue(expertId);
     query.addBindValue(cropAreaId);
+    query.addBindValue(title);
     query.addBindValue(content);
+    query.addBindValue(category);
     return query.exec();
 }
 
-bool DataBaseManager::UpdateExpertAdvice(int adviceId, const QString& content) {
+// 更新专家建议
+bool DataBaseManager::UpdateExpertAdvice(int adviceId, const QString& title, const QString& content, const QString& category) {
     QSqlQuery query(db);
-    query.prepare("UPDATE expert_advice SET content=? WHERE id=?");
+    query.prepare("UPDATE expert_advice SET title=?, content=?, category=? WHERE id=?");
+    query.addBindValue(title);
     query.addBindValue(content);
+    query.addBindValue(category);
     query.addBindValue(adviceId);
     return query.exec();
 }
 
+// 删除专家建议
 bool DataBaseManager::DeleteExpertAdvice(int adviceId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM expert_advice WHERE id=?");
@@ -272,18 +291,69 @@ bool DataBaseManager::DeleteExpertAdvice(int adviceId) {
     return query.exec();
 }
 
+// 获取特定种植区域的专家建议
 QVariantList DataBaseManager::GetExpertAdvices(int cropAreaId) {
     QVariantList result;
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM expert_advice WHERE crop_area_id=?");
+    query.prepare(
+        "SELECT ea.id, ea.title, ea.content, ea.category, ea.created_at, u.name AS expert_name "
+        "FROM expert_advice ea "
+        "JOIN expert e ON ea.expert_id = e.id "
+        "JOIN users u ON e.user_id = u.id "  // 通过用户表获取专家姓名
+        "WHERE ea.crop_area_id = ? "
+        "ORDER BY ea.created_at DESC"
+        );
     query.addBindValue(cropAreaId);
+
     if (query.exec()) {
         while (query.next()) {
-            QVariantList row;
-            for (int i = 0; i < query.record().count(); ++i)
-                row << query.value(i);
-            result << QVariant(row);
+            QVariantMap advice;
+            advice["id"] = query.value("id");
+            advice["title"] = query.value("title");
+            advice["content"] = query.value("content");
+            advice["category"] = query.value("category");
+            advice["created_at"] = query.value("created_at");
+            advice["expert_name"] = query.value("expert_name");
+            result.append(advice);
         }
+    } else {
+        qWarning() << "GetExpertAdvices error:" << query.lastError().text();
+    }
+    return result;
+}
+
+// 获取当前农户的所有专家建议
+QVariantList DataBaseManager::GetFarmerExpertAdvices(int farmerId) {
+    QVariantList result;
+    QSqlQuery query(db);
+    query.prepare(
+        "SELECT ea.id, ea.title, ea.content, ea.category, ea.created_at, u.name AS expert_name, "
+        "       ca.crop_type, ca.location AS crop_location "
+        "FROM expert_advice ea "
+        "JOIN expert e ON ea.expert_id = e.id "
+        "JOIN users u ON e.user_id = u.id "  // 通过用户表获取专家姓名
+        "JOIN crop_area ca ON ea.crop_area_id = ca.id "
+        "JOIN farmer f ON ca.farmer_id = f.id "
+        "WHERE f.id = ? "  // 通过农户ID过滤
+        "ORDER BY ea.created_at DESC"
+        );
+    query.addBindValue(farmerId);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QVariantMap advice;
+            advice["id"] = query.value("id");
+            advice["title"] = query.value("title");
+            advice["content"] = query.value("content");
+            advice["category"] = query.value("category");
+            advice["created_at"] = query.value("created_at");
+            advice["expert_name"] = query.value("expert_name");
+            advice["crop_type"] = query.value("crop_type");
+            advice["crop_location"] = query.value("crop_location");
+            result.append(advice);
+        }
+    } else {
+        qWarning() << "GetFarmerExpertAdvices error:" << query.lastError().text();
     }
     return result;
 }

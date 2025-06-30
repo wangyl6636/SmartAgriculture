@@ -11,6 +11,7 @@ CONFIG += c++17
 
 SOURCES += \
     adminwindow.cpp \
+    changeinfowindow.cpp \
     databasemanager.cpp \
     expertwindow.cpp \
     farmerwindow.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 
 HEADERS += \
     adminwindow.h \
+    changeinfowindow.h \
     databasemanager.h \
     expertwindow.h \
     farmerwindow.h \
@@ -28,6 +30,7 @@ HEADERS += \
 
 FORMS += \
     adminwindow.ui \
+    changeinfowindow.ui \
     expertwindow.ui \
     farmerwindow.ui \
     mainwindow.ui \

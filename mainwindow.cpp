@@ -95,7 +95,7 @@ void MainWindow::on_pushButtonLogin_clicked()
         role = "farmer";
     }else if(role == "专家") {
         role = "expert";
-    }
+    } 
 
     // 检查用户登录
     DataBaseManager &db = DataBaseManager::instance();
@@ -116,7 +116,13 @@ void MainWindow::on_pushButtonLogin_clicked()
                 aWindow->show();
             } else if (role == "farmer") {
                 // 跳转到农户界面
-                fWindow = new FarmerWindow();
+                int userId = db.GetUserIdByPhone(phone);
+                int farmerId = db.GetFarmerId(userId);
+
+                qDebug()<<"当前农户用户id："<<userId;
+                qDebug()<<"当前农户id："<<farmerId;
+
+                fWindow = new FarmerWindow(farmerId);
                 fWindow->show();
             } else if (role == "expert") {
                 // 跳转到专家界面
