@@ -100,6 +100,13 @@ void MainWindow::on_pushButtonLogin_clicked()
     // 检查用户登录
     DataBaseManager &db = DataBaseManager::instance();
     QString userRole;
+
+    //判断数据库是否连接
+    if (!db.TestConnection()) {
+        QMessageBox::warning(this, "警告", "数据库连接不稳定，请检查网络后重试！");
+        return;
+    }
+
     if (db.CheckUserLogin(name, phone, password, userRole)) {
         if (userRole == role) {
             // 登录成功，跳转到对应的界面

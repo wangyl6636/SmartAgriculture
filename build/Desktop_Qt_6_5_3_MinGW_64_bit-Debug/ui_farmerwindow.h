@@ -11,9 +11,14 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QMainWindow>
-#include <QtWidgets/QMenuBar>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QScrollArea>
+#include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QStatusBar>
+#include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -22,7 +27,17 @@ class Ui_FarmerWindow
 {
 public:
     QWidget *centralwidget;
-    QMenuBar *menubar;
+    QVBoxLayout *mainLayout;
+    QWidget *navBar;
+    QHBoxLayout *navLayout;
+    QLabel *titleLabel;
+    QSpacerItem *horizontalSpacer;
+    QPushButton *updateInfoButton;
+    QPushButton *suggestButton;
+    QScrollArea *suggestionArea;
+    QWidget *scrollAreaWidgetContents;
+    QVBoxLayout *suggestionsLayout;
+    QLabel *emptyLabel;
     QStatusBar *statusbar;
 
     void setupUi(QMainWindow *FarmerWindow)
@@ -32,11 +47,59 @@ public:
         FarmerWindow->resize(800, 600);
         centralwidget = new QWidget(FarmerWindow);
         centralwidget->setObjectName("centralwidget");
+        mainLayout = new QVBoxLayout(centralwidget);
+        mainLayout->setObjectName("mainLayout");
+        navBar = new QWidget(centralwidget);
+        navBar->setObjectName("navBar");
+        navBar->setMinimumHeight(70);
+        navLayout = new QHBoxLayout(navBar);
+        navLayout->setSpacing(20);
+        navLayout->setObjectName("navLayout");
+        navLayout->setContentsMargins(20, 0, 20, 0);
+        titleLabel = new QLabel(navBar);
+        titleLabel->setObjectName("titleLabel");
+
+        navLayout->addWidget(titleLabel);
+
+        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        navLayout->addItem(horizontalSpacer);
+
+        updateInfoButton = new QPushButton(navBar);
+        updateInfoButton->setObjectName("updateInfoButton");
+
+        navLayout->addWidget(updateInfoButton);
+
+        suggestButton = new QPushButton(navBar);
+        suggestButton->setObjectName("suggestButton");
+
+        navLayout->addWidget(suggestButton);
+
+
+        mainLayout->addWidget(navBar);
+
+        suggestionArea = new QScrollArea(centralwidget);
+        suggestionArea->setObjectName("suggestionArea");
+        suggestionArea->setWidgetResizable(true);
+        suggestionArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+        suggestionArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        scrollAreaWidgetContents = new QWidget();
+        scrollAreaWidgetContents->setObjectName("scrollAreaWidgetContents");
+        suggestionsLayout = new QVBoxLayout(scrollAreaWidgetContents);
+        suggestionsLayout->setSpacing(15);
+        suggestionsLayout->setObjectName("suggestionsLayout");
+        suggestionsLayout->setContentsMargins(20, 15, 20, 15);
+        emptyLabel = new QLabel(scrollAreaWidgetContents);
+        emptyLabel->setObjectName("emptyLabel");
+        emptyLabel->setAlignment(Qt::AlignCenter);
+
+        suggestionsLayout->addWidget(emptyLabel);
+
+        suggestionArea->setWidget(scrollAreaWidgetContents);
+
+        mainLayout->addWidget(suggestionArea);
+
         FarmerWindow->setCentralWidget(centralwidget);
-        menubar = new QMenuBar(FarmerWindow);
-        menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 800, 17));
-        FarmerWindow->setMenuBar(menubar);
         statusbar = new QStatusBar(FarmerWindow);
         statusbar->setObjectName("statusbar");
         FarmerWindow->setStatusBar(statusbar);
@@ -48,7 +111,80 @@ public:
 
     void retranslateUi(QMainWindow *FarmerWindow)
     {
-        FarmerWindow->setWindowTitle(QCoreApplication::translate("FarmerWindow", "MainWindow", nullptr));
+        FarmerWindow->setWindowTitle(QCoreApplication::translate("FarmerWindow", "\345\206\234\346\210\267\347\256\241\347\220\206\345\271\263\345\217\260", nullptr));
+        FarmerWindow->setStyleSheet(QCoreApplication::translate("FarmerWindow", "background-color: #f5f7fa;", nullptr));
+        navBar->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
+"         background-color: #ffffff;\n"
+"         border-bottom: 1px solid #e0e6ed;\n"
+"         border-radius: 0;\n"
+"       ", nullptr));
+        titleLabel->setText(QCoreApplication::translate("FarmerWindow", "\345\206\234\346\210\267\347\256\241\347\220\206\345\271\263\345\217\260", nullptr));
+        titleLabel->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
+"            font-size: 22px;\n"
+"            font-weight: bold;\n"
+"            color: #2c3e50;\n"
+"          ", nullptr));
+        updateInfoButton->setText(QCoreApplication::translate("FarmerWindow", "\344\270\252\344\272\272\344\277\241\346\201\257\347\256\241\347\220\206", nullptr));
+        updateInfoButton->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
+"            QPushButton {\n"
+"              background-color: #3498db;\n"
+"              color: white;\n"
+"              border-radius: 6px;\n"
+"              padding: 10px 20px;\n"
+"              font-size: 14px;\n"
+"              font-weight: bold;\n"
+"              border: none;\n"
+"            }\n"
+"            QPushButton:hover {\n"
+"              background-color: #2980b9;\n"
+"            }\n"
+"          ", nullptr));
+        suggestButton->setText(QCoreApplication::translate("FarmerWindow", "\346\217\220\344\272\244\347\247\215\346\244\215\345\273\272\350\256\256", nullptr));
+        suggestButton->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
+"            QPushButton {\n"
+"              background-color: #27ae60;\n"
+"              color: white;\n"
+"              border-radius: 6px;\n"
+"              padding: 10px 20px;\n"
+"              font-size: 14px;\n"
+"              font-weight: bold;\n"
+"              border: none;\n"
+"            }\n"
+"            QPushButton:hover {\n"
+"              background-color: #219653;\n"
+"            }\n"
+"          ", nullptr));
+        suggestionArea->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
+"         QScrollArea {\n"
+"           border: none;\n"
+"           background: transparent;\n"
+"         }\n"
+"         QScrollBar:vertical {\n"
+"           border: none;\n"
+"           background: #f0f4f8;\n"
+"           width: 8px;\n"
+"           margin: 0;\n"
+"         }\n"
+"         QScrollBar::handle:vertical {\n"
+"           background: #cbd2d9;\n"
+"           border-radius: 4px;\n"
+"         }\n"
+"         QScrollBar::add-line:vertical, \n"
+"         QScrollBar::sub-line:vertical {\n"
+"           height: 0;\n"
+"         }\n"
+"       ", nullptr));
+        emptyLabel->setText(QCoreApplication::translate("FarmerWindow", "\346\232\202\346\227\240\344\270\223\345\256\266\345\273\272\350\256\256\357\274\214\347\263\273\347\273\237\345\260\206\346\240\271\346\215\256\346\202\250\347\232\204\347\247\215\346\244\215\346\203\205\345\206\265\345\256\236\346\227\266\346\216\250\351\200\201", nullptr));
+        emptyLabel->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
+"             color: #95a5a6;\n"
+"             font-size: 14px;\n"
+"             padding: 30px;\n"
+"           ", nullptr));
+        statusbar->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
+"      background: #f0f4f8;\n"
+"      color: #7f8c8d;\n"
+"      padding: 0 10px;\n"
+"    ", nullptr));
     } // retranslateUi
 
 };

@@ -11,20 +11,211 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>农户管理平台</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>17</height>
-    </rect>
+  <property name="styleSheet">
+   <string>background-color: #f5f7fa;</string>
+  </property>
+
+  <!-- 主界面容器 -->
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+   
+    <!-- 顶部导航栏 -->
+    <item>
+     <widget class="QWidget" name="navBar">
+      <property name="minimumHeight">
+       <number>70</number>
+      </property>
+      <property name="styleSheet">
+       <string><![CDATA[
+         background-color: #ffffff;
+         border-bottom: 1px solid #e0e6ed;
+         border-radius: 0;
+       ]]></string>
+      </property>
+      <layout class="QHBoxLayout" name="navLayout">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="titleLabel">
+         <property name="text">
+          <string>农户管理平台</string>
+         </property>
+         <property name="styleSheet">
+          <string><![CDATA[
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+          ]]></string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="updateInfoButton">
+         <property name="text">
+          <string>个人信息管理</string>
+         </property>
+         <property name="styleSheet">
+          <string><![CDATA[
+            QPushButton {
+              background-color: #3498db;
+              color: white;
+              border-radius: 6px;
+              padding: 10px 20px;
+              font-size: 14px;
+              font-weight: bold;
+              border: none;
+            }
+            QPushButton:hover {
+              background-color: #2980b9;
+            }
+          ]]></string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="suggestButton">
+         <property name="text">
+          <string>提交种植建议</string>
+         </property>
+         <property name="styleSheet">
+          <string><![CDATA[
+            QPushButton {
+              background-color: #27ae60;
+              color: white;
+              border-radius: 6px;
+              padding: 10px 20px;
+              font-size: 14px;
+              font-weight: bold;
+              border: none;
+            }
+            QPushButton:hover {
+              background-color: #219653;
+            }
+          ]]></string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    
+    <!-- 专家建议区 -->
+    <item>
+     <widget class="QScrollArea" name="suggestionArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="styleSheet">
+       <string><![CDATA[
+         QScrollArea {
+           border: none;
+           background: transparent;
+         }
+         QScrollBar:vertical {
+           border: none;
+           background: #f0f4f8;
+           width: 8px;
+           margin: 0;
+         }
+         QScrollBar::handle:vertical {
+           background: #cbd2d9;
+           border-radius: 4px;
+         }
+         QScrollBar::add-line:vertical, 
+         QScrollBar::sub-line:vertical {
+           height: 0;
+         }
+       ]]></string>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <layout class="QVBoxLayout" name="suggestionsLayout">
+        <property name="spacing">
+         <number>15</number>
+        </property>
+        <property name="leftMargin">
+         <number>20</number>
+        </property>
+        <property name="topMargin">
+         <number>15</number>
+        </property>
+        <property name="rightMargin">
+         <number>20</number>
+        </property>
+        <property name="bottomMargin">
+         <number>15</number>
+        </property>
+        
+        <!-- 空状态提示 -->
+        <item>
+         <widget class="QLabel" name="emptyLabel">
+          <property name="text">
+           <string>暂无专家建议，系统将根据您的种植情况实时推送</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="styleSheet">
+           <string><![CDATA[
+             color: #95a5a6;
+             font-size: 14px;
+             padding: 30px;
+           ]]></string>
+          </property>
+         </widget>
+        </item>
+        
+       </layout>
+      </widget>
+     </widget>
+    </item>
+    
+   </layout>
+  </widget>
+  
+  <!-- 状态栏 -->
+  <widget class="QStatusBar" name="statusbar">
+   <property name="styleSheet">
+    <string><![CDATA[
+      background: #f0f4f8;
+      color: #7f8c8d;
+      padding: 0 10px;
+    ]]></string>
    </property>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

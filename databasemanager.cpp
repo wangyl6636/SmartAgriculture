@@ -510,7 +510,7 @@ bool DataBaseManager::TestConnection() {
     }
 
     // 检查查询响应时间，避免长时间卡顿
-    if (timer.elapsed() > 2000) { // 2秒超时
+    if (timer.elapsed() > 1000) { // 2秒超时
         return false;
     }
 
