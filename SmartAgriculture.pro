@@ -13,28 +13,34 @@ SOURCES += \
     adminwindow.cpp \
     changeinfowindow.cpp \
     databasemanager.cpp \
+    expertadviceform.cpp \
     expertwindow.cpp \
     farmerwindow.cpp \
     main.cpp \
     mainwindow.cpp \
-    registerwindow.cpp
+    registerwindow.cpp \
+    systemadviceform.cpp
 
 HEADERS += \
     adminwindow.h \
     changeinfowindow.h \
     databasemanager.h \
+    expertadviceform.h \
     expertwindow.h \
     farmerwindow.h \
     mainwindow.h \
-    registerwindow.h
+    registerwindow.h \
+    systemadviceform.h
 
 FORMS += \
     adminwindow.ui \
     changeinfowindow.ui \
+    expertadviceform.ui \
     expertwindow.ui \
     farmerwindow.ui \
     mainwindow.ui \
-    registerwindow.ui
+    registerwindow.ui \
+    systemadviceform.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -20,6 +20,12 @@ FarmerWindow::FarmerWindow(int farmerId, QWidget *parent)
     ui->setupUi(this);
     initUI();
     loadSuggestions();
+
+    changeWindow = nullptr;
+    systemAdviceForm = nullptr;
+
+    //连接槽函数
+    connect(ui->updateInfoButton,&QPushButton::clicked,this, &FarmerWindow::UpdateButtonClicked);
 }
 
 FarmerWindow::~FarmerWindow()
@@ -270,4 +276,39 @@ void FarmerWindow::refreshSuggestions()
 {
     loadSuggestions();
     qDebug()<<"刷新";
+}
+
+void FarmerWindow::UpdateButtonClicked(){
+    this->hide();
+    if(changeWindow==nullptr){
+        changeWindow = new ChangeInfoWindow(currentFarmerId,0);
+        connect(changeWindow,&ChangeInfoWindow::closeSignal,this,&FarmerWindow::ReShow);
+    }
+    changeWindow->show();
+}
+
+void FarmerWindow::on_suggestButton_clicked() {
+    this->hide();
+    if (systemAdviceForm == nullptr) {
+        systemAdviceForm = new SystemAdviceForm(currentFarmerId,0);
+        connect(systemAdviceForm, &SystemAdviceForm::closeSignal, this, &FarmerWindow::ReShow);
+    }
+    systemAdviceForm->show();
+}
+
+void FarmerWindow::ReShow(){
+    this->show();
+    if(changeWindow != nullptr){
+        disconnect(changeWindow, &ChangeInfoWindow::closeSignal, this, &FarmerWindow::ReShow);
+        delete changeWindow;
+        changeWindow = nullptr;
+    }
+
+    if(systemAdviceForm != nullptr){
+        disconnect(systemAdviceForm, &SystemAdviceForm::closeSignal, this, &FarmerWindow::ReShow);
+        delete systemAdviceForm;
+        systemAdviceForm = nullptr;
+    }
+
+    refreshSuggestions();
 }

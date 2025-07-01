@@ -24,6 +24,8 @@ public:
     QVariantList GetUserInfo(int userId); // 获取指定用户信息
     QVariantList GetAllUsers(); // 获取所有用户信息
     int GetUserIdByPhone(const QString& phone);
+    int GetUserIdByFarmerId(int FarmerId);
+    int GetUserIdByExpertId(int ExperId);
 
 
     //农户相关
@@ -34,7 +36,9 @@ public:
     //专家相关
     bool AddExpertUser(const int userId,const QString& field);
     bool DeleteExpertUser(const int expertId);
-    int GetExpertId(const int experId);
+    int GetExpertId(const int userId);
+    QString GetExpertField(const int expertId);
+    bool UpdateExpert(int expertId, const QString& field); // 新增：更新专家领域
 
     // 作物区相关
     bool AddCropArea(int farmerId, const QString& cropType, float area, const QString& location, const QString& detail); // 添加作物区
@@ -59,15 +63,18 @@ public:
     QVariantList GetAllExpertAdvices(); // 获取所有专家建议
 
     // 模型优化建议相关
-    bool AddModelOptimization(int systemAdviceId, int farmerId, int expertId, const QString& content); // 添加模型优化建议
+    bool AddModelOptimization(int userId, int role, const QString& content); // 添加模型优化建议
     bool UpdateModelOptimization(int optimizationId, const QString& content); // 更新模型优化建议
     bool DeleteModelOptimization(int optimizationId); // 删除模型优化建议
-    QVariantList GetModelOptimizations(int systemAdviceId); // 获取指定系统建议的模型优化建议
+    QVariantList GetModelOptimizations(); // 获取所有模型优化建议
     QVariantList GetAllModelOptimizations(); // 获取所有模型优化建议
 
     // 传感器相关
     QVariantList GetSensorInfo(int sensorId); // 获取指定条数信息
     QVariantList GetAllSensors(); // 获取所有传感器信息
+
+    // 查询某专家对某作物区的所有建议
+    QVariantList GetExpertAdviceList(int expertId, int cropAreaId);
 
     // 单例获取接口
     static DataBaseManager& instance(); // 获取单例对象

@@ -139,6 +139,27 @@ int DataBaseManager::GetUserIdByPhone(const QString& phone) {
     return -1;  // 如果没有找到该电话号码的用户，返回 -1
 }
 
+int DataBaseManager::GetUserIdByFarmerId(int FarmerId){
+    QSqlQuery query(db);
+    query.prepare("SELECT user_id FROM farmer WHERE id = :farmerid");
+    query.bindValue(":farmerid",FarmerId);
+    if(query.exec()&&query.next()){
+        return query.value(0).toInt();
+    }
+    return -1;
+}
+
+int DataBaseManager::GetUserIdByExpertId(int ExpertId){
+    QSqlQuery query(db);
+    query.prepare("SELECT user_id FROM expert WHERE id = :expertId");
+    query.bindValue(":expertId", ExpertId);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();  // 返回对应的 userId
+    }
+    return -1;  // 如果没有找到该专家ID对应的用户，返回 -1
+}
+
 
 // 作物区相关
 bool DataBaseManager::AddCropArea(int farmerId, const QString& cropType, float area, const QString& location, const QString& detail) {
@@ -167,7 +188,14 @@ bool DataBaseManager::DeleteCropArea(int cropAreaId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM crop_area WHERE id=?");
     query.addBindValue(cropAreaId);
-    return query.exec();
+
+    if (!query.exec()) {
+        qDebug() << "DeleteCropArea error:" << query.lastError().text();
+        qDebug() << "Query:" << query.lastQuery();
+        qDebug() << "CropAreaID:" << cropAreaId;
+        return false;
+    }
+    return true;
 }
 
 QVariantList DataBaseManager::GetCropAreas(int farmerId) {
@@ -175,14 +203,26 @@ QVariantList DataBaseManager::GetCropAreas(int farmerId) {
     QSqlQuery query(db);
     query.prepare("SELECT * FROM crop_area WHERE farmer_id=?");
     query.addBindValue(farmerId);
+
     if (query.exec()) {
         while (query.next()) {
             QVariantList row;
-            for (int i = 0; i < query.record().count(); ++i)
-                row << query.value(i);
-            result << QVariant(row);
+            row << query.value("id");
+            row << query.value("farmer_id");
+            row << query.value("crop_type");
+            row << query.value("area");
+            row << query.value("location");
+            row << query.value("detail");
+
+            qDebug() << "查询结果：crop_type = " << query.value("crop_type").toString()
+                     << ", location = " << query.value("location").toString(); // 打印调试信息
+
+            result.append(row);
         }
+    } else {
+        qDebug() << "数据库查询失败：" << query.lastError().text();  // 输出错误信息
     }
+    qDebug()<<"result:"<<result.size();
     return result;
 }
 
@@ -374,12 +414,11 @@ QVariantList DataBaseManager::GetAllExpertAdvices() {
 }
 
 // 模型优化建议相关
-bool DataBaseManager::AddModelOptimization(int systemAdviceId, int farmerId, int expertId, const QString& content) {
+bool DataBaseManager::AddModelOptimization(int userId, int role, const QString& content) {
     QSqlQuery query(db);
-    query.prepare("INSERT INTO model_optimization (system_advice_id, farmer_id, expert_id, content) VALUES (?, ?, ?, ?)");
-    query.addBindValue(systemAdviceId);
-    query.addBindValue(farmerId);
-    query.addBindValue(expertId);
+    query.prepare("INSERT INTO model_optimization (user_id, role, content) VALUES (?, ?, ?)");
+    query.addBindValue(userId);
+    query.addBindValue(role);
     query.addBindValue(content);
     return query.exec();
 }
@@ -399,11 +438,10 @@ bool DataBaseManager::DeleteModelOptimization(int optimizationId) {
     return query.exec();
 }
 
-QVariantList DataBaseManager::GetModelOptimizations(int systemAdviceId) {
+QVariantList DataBaseManager::GetModelOptimizations() {
     QVariantList result;
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM model_optimization WHERE system_advice_id=?");
-    query.addBindValue(systemAdviceId);
+    query.prepare("SELECT * FROM model_optimization");
     if (query.exec()) {
         while (query.next()) {
             QVariantList row;
@@ -526,7 +564,6 @@ bool DataBaseManager::AddExpertUser(const int userId, const QString& field) {
     return query.exec();
 }
 
-// 删除指定的专家用户
 bool DataBaseManager::DeleteExpertUser(const int expertId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM expert WHERE id=:expertId");
@@ -536,7 +573,6 @@ bool DataBaseManager::DeleteExpertUser(const int expertId) {
     return success;  // 返回是否删除成功
 }
 
-// 根据 userId 获取对应的 expertId
 int DataBaseManager::GetExpertId(const int userId) {
     QSqlQuery query(db);
     query.prepare("SELECT id FROM expert WHERE user_id=:userId");
@@ -546,6 +582,16 @@ int DataBaseManager::GetExpertId(const int userId) {
         return query.value(0).toInt();  // 返回对应的 expertId
     }
     return -1;  // 如果没有找到专家信息，返回 -1
+}
+
+QString DataBaseManager::GetExpertField(const int expertId){
+    QSqlQuery query(db);
+    query.prepare("SELECT field FROM expert WHERE id=:expertId");
+    query.bindValue(":expertId", expertId);
+    if (query.exec() && query.next()) {
+        return query.value(0).toString();  // 返回对应的 field
+    }
+    return QString();  // 如果没有找到专家信息，返回空字符串
 }
 
 QString DataBaseManager::GetLastError() const {
@@ -585,4 +631,36 @@ bool DataBaseManager::TestConnection() {
     }
 
     return testQuery.next() && testQuery.value(0).toInt() == 1;
+}
+
+bool DataBaseManager::UpdateExpert(int expertId, const QString& field) {
+    QSqlQuery query(db);
+    query.prepare("UPDATE expert SET field = :field WHERE id = :id");
+    query.bindValue(":field", field);
+    query.bindValue(":id", expertId);
+    return query.exec();
+}
+
+QVariantList DataBaseManager::GetExpertAdviceList(int expertId, int cropAreaId)
+{
+    QVariantList adviceList;
+    QSqlQuery query(db);
+    query.prepare("SELECT id, title, content, created_at, category FROM expert_advice WHERE expert_id = :expertId AND crop_area_id = :cropAreaId ORDER BY created_at DESC");
+    query.bindValue(":expertId", expertId);
+    query.bindValue(":cropAreaId", cropAreaId);
+
+    if (query.exec()) {
+        while (query.next()) {
+            QVariantList advice;
+            advice << query.value("id")           // 0: 建议ID
+                   << query.value("title")        // 1: 标题
+                   << query.value("content")      // 2: 内容
+                   << query.value("created_at")   // 3: 时间
+                   << query.value("category");    // 4: 类别
+            adviceList << QVariant(advice);
+        }
+    }
+
+    qDebug() << "GetExpertAdviceList adviceList:" << adviceList;
+    return adviceList;
 }

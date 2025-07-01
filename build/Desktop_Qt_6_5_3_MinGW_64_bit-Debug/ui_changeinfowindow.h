@@ -52,16 +52,12 @@ public:
     QWidget *cropAreaList;
     QVBoxLayout *cropAreaLayout;
     QWidget *widget;
+    QVBoxLayout *vboxLayout;
     QHBoxLayout *hboxLayout;
-    QFormLayout *formLayout;
     QLabel *label;
-    QLabel *cropTypeLabel;
+    QPushButton *pushButton;
+    QPushButton *pushButton1;
     QLabel *label1;
-    QLabel *cropAreaLabel;
-    QLabel *label2;
-    QLabel *cropLocationLabel;
-    QSpacerItem *horizontalSpacer;
-    QPushButton *modifyCropButton;
     QLabel *noCropLabel;
     QPushButton *addCropButton;
     QWidget *expertPage;
@@ -164,57 +160,39 @@ public:
         cropAreaList = new QWidget();
         cropAreaList->setObjectName("cropAreaList");
         cropAreaLayout = new QVBoxLayout(cropAreaList);
-        cropAreaLayout->setSpacing(10);
+        cropAreaLayout->setSpacing(16);
         cropAreaLayout->setObjectName("cropAreaLayout");
         cropAreaLayout->setContentsMargins(0, 0, 0, 0);
         widget = new QWidget(cropAreaList);
         widget->setObjectName("widget");
-        hboxLayout = new QHBoxLayout(widget);
+        vboxLayout = new QVBoxLayout(widget);
+        vboxLayout->setObjectName("vboxLayout");
+        vboxLayout->setContentsMargins(0, 0, 0, 0);
+        hboxLayout = new QHBoxLayout();
         hboxLayout->setObjectName("hboxLayout");
-        hboxLayout->setContentsMargins(0, 0, 0, 0);
-        formLayout = new QFormLayout();
-        formLayout->setObjectName("formLayout");
         label = new QLabel(widget);
         label->setObjectName("label");
 
-        formLayout->setWidget(0, QFormLayout::LabelRole, label);
+        hboxLayout->addWidget(label);
 
-        cropTypeLabel = new QLabel(widget);
-        cropTypeLabel->setObjectName("cropTypeLabel");
+        pushButton = new QPushButton(widget);
+        pushButton->setObjectName("pushButton");
 
-        formLayout->setWidget(0, QFormLayout::FieldRole, cropTypeLabel);
+        hboxLayout->addWidget(pushButton);
+
+        pushButton1 = new QPushButton(widget);
+        pushButton1->setObjectName("pushButton1");
+
+        hboxLayout->addWidget(pushButton1);
+
+
+        vboxLayout->addLayout(hboxLayout);
 
         label1 = new QLabel(widget);
         label1->setObjectName("label1");
+        label1->setWordWrap(true);
 
-        formLayout->setWidget(1, QFormLayout::LabelRole, label1);
-
-        cropAreaLabel = new QLabel(widget);
-        cropAreaLabel->setObjectName("cropAreaLabel");
-
-        formLayout->setWidget(1, QFormLayout::FieldRole, cropAreaLabel);
-
-        label2 = new QLabel(widget);
-        label2->setObjectName("label2");
-
-        formLayout->setWidget(2, QFormLayout::LabelRole, label2);
-
-        cropLocationLabel = new QLabel(widget);
-        cropLocationLabel->setObjectName("cropLocationLabel");
-
-        formLayout->setWidget(2, QFormLayout::FieldRole, cropLocationLabel);
-
-
-        hboxLayout->addLayout(formLayout);
-
-        horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        hboxLayout->addItem(horizontalSpacer);
-
-        modifyCropButton = new QPushButton(widget);
-        modifyCropButton->setObjectName("modifyCropButton");
-
-        hboxLayout->addWidget(modifyCropButton);
+        vboxLayout->addWidget(label1);
 
 
         cropAreaLayout->addWidget(widget);
@@ -380,61 +358,72 @@ public:
 "       ", nullptr));
         cropAreaTitle->setText(QCoreApplication::translate("ChangeInfoWindow", "\346\210\221\347\232\204\344\275\234\347\211\251\345\214\272", nullptr));
         cropAreaTitle->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "\n"
-"             font-size: 18px;\n"
+"             font-size: 20px;\n"
 "             font-weight: bold;\n"
 "             color: #2c3e50;\n"
-"             padding-bottom: 10px;\n"
-"             border-bottom: 1px solid #e0e6ed;\n"
+"             padding-bottom: 12px;\n"
+"             border-bottom: 2px solid #e0e6ed;\n"
 "           ", nullptr));
         cropAreaScroll->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "\n"
 "             background: transparent;\n"
 "             border: none;\n"
 "           ", nullptr));
         widget->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "\n"
-"                 background: #ffffff;\n"
-"                 border-radius: 8px;\n"
-"                 padding: 15px;\n"
-"                 border: 1px solid #e0e6ed;\n"
+"                 background: #fff;\n"
+"                 border-radius: 12px;\n"
+"                 border: 1.5px solid #e0e6ed;\n"
+"                 margin-bottom: 10px;\n"
+"                 padding: 18px 14px 14px 18px;\n"
 "               ", nullptr));
-        label->setText(QCoreApplication::translate("ChangeInfoWindow", "\344\275\234\347\211\251\347\261\273\345\236\213\357\274\232", nullptr));
-        label->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "font-weight: bold; color: #2c3e50;", nullptr));
-        cropTypeLabel->setText(QCoreApplication::translate("ChangeInfoWindow", "\345\260\217\351\272\246", nullptr));
-        label1->setText(QCoreApplication::translate("ChangeInfoWindow", "\351\235\242\347\247\257\357\274\232", nullptr));
-        label1->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "font-weight: bold; color: #2c3e50;", nullptr));
-        cropAreaLabel->setText(QCoreApplication::translate("ChangeInfoWindow", "50\344\272\251", nullptr));
-        label2->setText(QCoreApplication::translate("ChangeInfoWindow", "\344\275\215\347\275\256\357\274\232", nullptr));
-        label2->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "font-weight: bold; color: #2c3e50;", nullptr));
-        cropLocationLabel->setText(QCoreApplication::translate("ChangeInfoWindow", "\344\270\234\345\214\272\345\206\234\345\234\272A\345\234\260\345\235\227", nullptr));
-        modifyCropButton->setText(QCoreApplication::translate("ChangeInfoWindow", "\344\277\256\346\224\271", nullptr));
-        modifyCropButton->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "\n"
-"                    QPushButton {\n"
-"                      background-color: #3498db;\n"
-"                      color: white;\n"
-"                      border-radius: 6px;\n"
-"                      padding: 8px 16px;\n"
-"                      font-size: 13px;\n"
-"                      font-weight: bold;\n"
-"                      border: none;\n"
-"                    }\n"
-"                    QPushButton:hover {\n"
-"                      background-color: #2980b9;\n"
-"                    }\n"
-"                  ", nullptr));
+        label->setText(QCoreApplication::translate("ChangeInfoWindow", "\345\260\217\351\272\246 | 50\344\272\251 | \350\215\206\345\267\236\345\270\202\350\261\271\345\255\220\345\262\255\346\235\221", nullptr));
+        label->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "font-size: 16px; color: #2c3e50;", nullptr));
+        pushButton->setText(QCoreApplication::translate("ChangeInfoWindow", "\347\274\226\350\276\221", nullptr));
+        pushButton->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "\n"
+"                      QPushButton {\n"
+"                        background: #f0fff4;\n"
+"                        color: #27ae60;\n"
+"                        border: 1.5px solid #27ae60;\n"
+"                        border-radius: 6px;\n"
+"                        padding: 8px 22px;\n"
+"                        font-size: 15px;\n"
+"                        font-weight: bold;\n"
+"                      }\n"
+"                      QPushButton:hover {\n"
+"                        background: #e0f7e0;\n"
+"                      }\n"
+"                    ", nullptr));
+        pushButton1->setText(QCoreApplication::translate("ChangeInfoWindow", "\345\210\240\351\231\244", nullptr));
+        pushButton1->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "\n"
+"                      QPushButton {\n"
+"                        background: #fff0f0;\n"
+"                        color: #e74c3c;\n"
+"                        border: 1.5px solid #e74c3c;\n"
+"                        border-radius: 6px;\n"
+"                        padding: 8px 22px;\n"
+"                        font-size: 15px;\n"
+"                        font-weight: bold;\n"
+"                      }\n"
+"                      QPushButton:hover {\n"
+"                        background: #ffe0e0;\n"
+"                      }\n"
+"                    ", nullptr));
+        label1->setText(QCoreApplication::translate("ChangeInfoWindow", "\350\257\264\346\230\216\357\274\232\346\234\254\345\234\260\344\274\230\350\264\250\345\260\217\351\272\246\357\274\214\351\200\202\345\220\210\346\230\245\345\255\243\347\247\215\346\244\215\343\200\202", nullptr));
+        label1->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "font-size: 14px; color: #888; background: #f8f9fa; border-radius: 5px; padding: 8px 12px; margin-top: 6px;", nullptr));
         noCropLabel->setText(QCoreApplication::translate("ChangeInfoWindow", "\346\232\202\346\227\240\344\275\234\347\211\251\345\214\272\344\277\241\346\201\257", nullptr));
-        noCropLabel->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "color: #95a5a6; font-size: 14px; padding: 30px;", nullptr));
+        noCropLabel->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "color: #b0b0b0; font-size: 18px; padding: 50px 0; background: #f8f9fa; border-radius: 10px; font-weight: bold;", nullptr));
         addCropButton->setText(QCoreApplication::translate("ChangeInfoWindow", "\346\267\273\345\212\240\344\275\234\347\211\251\345\214\272", nullptr));
         addCropButton->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "\n"
 "             QPushButton {\n"
-"               background-color: #27ae60;\n"
+"               background: #27ae60;\n"
 "               color: white;\n"
-"               border-radius: 6px;\n"
-"               padding: 10px 20px;\n"
-"               font-size: 14px;\n"
+"               border-radius: 8px;\n"
+"               padding: 14px 0;\n"
+"               font-size: 18px;\n"
 "               font-weight: bold;\n"
-"               border: none;\n"
+"               margin-top: 10px;\n"
 "             }\n"
 "             QPushButton:hover {\n"
-"               background-color: #219653;\n"
+"               background: #219653;\n"
 "             }\n"
 "           ", nullptr));
         expertiseGroup->setTitle(QCoreApplication::translate("ChangeInfoWindow", "\346\223\205\351\225\277\351\242\206\345\237\237", nullptr));

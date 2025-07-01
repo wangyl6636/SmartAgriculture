@@ -1,5 +1,7 @@
 #ifndef FARMERWINDOW_H
 #define FARMERWINDOW_H
+#include "changeinfowindow.h"
+#include "systemadviceform.h"
 
 #include <QMainWindow>
 #include <QMap>
@@ -18,10 +20,19 @@ public:
 
 private slots:
     void refreshSuggestions();
+    void UpdateButtonClicked();
+    void ReShow();
+    void on_suggestButton_clicked();
 
 private:
     int currentFarmerId;
     Ui::FarmerWindow *ui;
+
+    //更改信息界面
+    ChangeInfoWindow *changeWindow;
+
+    // 系统建议界面
+    SystemAdviceForm *systemAdviceForm;
 
     // 类别颜色映射
     QMap<QString, QString> categoryColors = {

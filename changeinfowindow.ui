@@ -222,11 +222,11 @@
           </property>
           <property name="styleSheet">
            <string><![CDATA[
-             font-size: 18px;
+             font-size: 20px;
              font-weight: bold;
              color: #2c3e50;
-             padding-bottom: 10px;
-             border-bottom: 1px solid #e0e6ed;
+             padding-bottom: 12px;
+             border-bottom: 2px solid #e0e6ed;
            ]]></string>
           </property>
          </widget>
@@ -247,7 +247,7 @@
           <widget class="QWidget" name="cropAreaList">
            <layout class="QVBoxLayout" name="cropAreaLayout">
             <property name="spacing">
-             <number>10</number>
+             <number>16</number>
             </property>
             <property name="leftMargin">
              <number>0</number>
@@ -262,106 +262,89 @@
              <number>0</number>
             </property>
             
-            <!-- 作物区条目示例 -->
+            <!-- 卡片示例 -->
             <item>
              <widget class="QWidget">
               <property name="styleSheet">
                <string><![CDATA[
-                 background: #ffffff;
-                 border-radius: 8px;
-                 padding: 15px;
-                 border: 1px solid #e0e6ed;
+                 background: #fff;
+                 border-radius: 12px;
+                 border: 1.5px solid #e0e6ed;
+                 margin-bottom: 10px;
+                 padding: 18px 14px 14px 18px;
                ]]></string>
               </property>
-              <layout class="QHBoxLayout">
+              <layout class="QVBoxLayout">
                <item>
-                <layout class="QFormLayout">
-                 <item row="0" column="0">
+                <layout class="QHBoxLayout">
+                 <item>
                   <widget class="QLabel">
                    <property name="text">
-                    <string>作物类型：</string>
+                    <string>小麦 | 50亩 | 荆州市豹子岭村</string>
                    </property>
                    <property name="styleSheet">
-                    <string>font-weight: bold; color: #2c3e50;</string>
+                    <string>font-size: 16px; color: #2c3e50;</string>
                    </property>
                   </widget>
                  </item>
-                 <item row="0" column="1">
-                  <widget class="QLabel" name="cropTypeLabel">
+                 <item>
+                  <widget class="QPushButton">
                    <property name="text">
-                    <string>小麦</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0">
-                  <widget class="QLabel">
-                   <property name="text">
-                    <string>面积：</string>
+                    <string>编辑</string>
                    </property>
                    <property name="styleSheet">
-                    <string>font-weight: bold; color: #2c3e50;</string>
+                    <string><![CDATA[
+                      QPushButton {
+                        background: #f0fff4;
+                        color: #27ae60;
+                        border: 1.5px solid #27ae60;
+                        border-radius: 6px;
+                        padding: 8px 22px;
+                        font-size: 15px;
+                        font-weight: bold;
+                      }
+                      QPushButton:hover {
+                        background: #e0f7e0;
+                      }
+                    ]]></string>
                    </property>
                   </widget>
                  </item>
-                 <item row="1" column="1">
-                  <widget class="QLabel" name="cropAreaLabel">
+                 <item>
+                  <widget class="QPushButton">
                    <property name="text">
-                    <string>50亩</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel">
-                   <property name="text">
-                    <string>位置：</string>
+                    <string>删除</string>
                    </property>
                    <property name="styleSheet">
-                    <string>font-weight: bold; color: #2c3e50;</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QLabel" name="cropLocationLabel">
-                   <property name="text">
-                    <string>东区农场A地块</string>
+                    <string><![CDATA[
+                      QPushButton {
+                        background: #fff0f0;
+                        color: #e74c3c;
+                        border: 1.5px solid #e74c3c;
+                        border-radius: 6px;
+                        padding: 8px 22px;
+                        font-size: 15px;
+                        font-weight: bold;
+                      }
+                      QPushButton:hover {
+                        background: #ffe0e0;
+                      }
+                    ]]></string>
                    </property>
                   </widget>
                  </item>
                 </layout>
                </item>
                <item>
-                <spacer name="horizontalSpacer">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>40</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
-               </item>
-               <item>
-                <widget class="QPushButton" name="modifyCropButton">
+                <widget class="QLabel">
                  <property name="text">
-                  <string>修改</string>
+                  <string>说明：本地优质小麦，适合春季种植。</string>
                  </property>
                  <property name="styleSheet">
-                  <string><![CDATA[
-                    QPushButton {
-                      background-color: #3498db;
-                      color: white;
-                      border-radius: 6px;
-                      padding: 8px 16px;
-                      font-size: 13px;
-                      font-weight: bold;
-                      border: none;
-                    }
-                    QPushButton:hover {
-                      background-color: #2980b9;
-                    }
-                  ]]></string>
+                  <string>font-size: 14px; color: #888; background: #f8f9fa; border-radius: 5px; padding: 8px 12px; margin-top: 6px;</string>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -379,7 +362,7 @@
                <set>Qt::AlignCenter</set>
               </property>
               <property name="styleSheet">
-               <string>color: #95a5a6; font-size: 14px; padding: 30px;</string>
+               <string>color: #b0b0b0; font-size: 18px; padding: 50px 0; background: #f8f9fa; border-radius: 10px; font-weight: bold;</string>
               </property>
               <property name="visible">
                <bool>false</bool>
@@ -400,16 +383,16 @@
           <property name="styleSheet">
            <string><![CDATA[
              QPushButton {
-               background-color: #27ae60;
+               background: #27ae60;
                color: white;
-               border-radius: 6px;
-               padding: 10px 20px;
-               font-size: 14px;
+               border-radius: 8px;
+               padding: 14px 0;
+               font-size: 18px;
                font-weight: bold;
-               border: none;
+               margin-top: 10px;
              }
              QPushButton:hover {
-               background-color: #219653;
+               background: #219653;
              }
            ]]></string>
           </property>

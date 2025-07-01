@@ -65,6 +65,7 @@ void MainWindow::on_pushButtonRegister_clicked()
 // 这种方式可以避免直接删除主窗口实例，保持应用程序的稳定性和一致性
 void MainWindow::ReShow(){
     this->show();
+    connect(rWindow, &RegisterWindow::closedSignal, this, &MainWindow::ReShow);
     delete rWindow;
     rWindow=nullptr;
 }
@@ -126,7 +127,13 @@ void MainWindow::on_pushButtonLogin_clicked()
                 fWindow->show();
             } else if (role == "expert") {
                 // 跳转到专家界面
-                eWindow = new ExpertWindow();
+                int userId = db.GetUserIdByPhone(phone);
+                int expertId = db.GetExpertId(userId);
+
+                qDebug()<<"当前专家用户id："<<userId;   
+                qDebug()<<"当前专家id："<<expertId;
+
+                eWindow = new ExpertWindow(expertId);
                 eWindow->show();
             }
             this->hide(); // 隐藏登录窗口
