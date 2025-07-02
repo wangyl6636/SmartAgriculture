@@ -21,5 +21,9 @@ int main(int argc, char *argv[])
     } else {
         qDebug() << "Database connected successfully.";
     }
+
+    // 测试函数调用
+    DataBaseManager::instance().TestPrintSensorFunctions(2, "2025-06-01 00:00", "2025-07-02 23:00");
+
     return a.exec();
 }

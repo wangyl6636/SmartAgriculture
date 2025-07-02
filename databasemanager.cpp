@@ -242,62 +242,7 @@ QVariantList DataBaseManager::GetAllCropAreas() {
 }
 
 // 系统建议相关
-bool DataBaseManager::AddSystemAdvice(int sensorId, int cropAreaId, const QString& fertilizerAdvice, const QString& irrigationAdvice) {
-    QSqlQuery query(db);
-    query.prepare("INSERT INTO system_advice (sensor_id, crop_area_id, fertilizer_advice, irrigation_advice) VALUES (?, ?, ?, ?)");
-    query.addBindValue(sensorId);
-    query.addBindValue(cropAreaId);
-    query.addBindValue(fertilizerAdvice);
-    query.addBindValue(irrigationAdvice);
-    return query.exec();
-}
-
-bool DataBaseManager::UpdateSystemAdvice(int adviceId, const QString& fertilizerAdvice, const QString& irrigationAdvice) {
-    QSqlQuery query(db);
-    query.prepare("UPDATE system_advice SET fertilizer_advice=?, irrigation_advice=? WHERE id=?");
-    query.addBindValue(fertilizerAdvice);
-    query.addBindValue(irrigationAdvice);
-    query.addBindValue(adviceId);
-    return query.exec();
-}
-
-bool DataBaseManager::DeleteSystemAdvice(int adviceId) {
-    QSqlQuery query(db);
-    query.prepare("DELETE FROM system_advice WHERE id=?");
-    query.addBindValue(adviceId);
-    return query.exec();
-}
-
-QVariantList DataBaseManager::GetSystemAdvices(int cropAreaId) {
-    QVariantList result;
-    QSqlQuery query(db);
-    query.prepare("SELECT * FROM system_advice WHERE crop_area_id=?");
-    query.addBindValue(cropAreaId);
-    if (query.exec()) {
-        while (query.next()) {
-            QVariantList row;
-            for (int i = 0; i < query.record().count(); ++i)
-                row << query.value(i);
-            result << QVariant(row);
-        }
-    }
-    return result;
-}
-
-QVariantList DataBaseManager::GetAllSystemAdvices() {
-    QVariantList result;
-    QSqlQuery query(db);
-    query.prepare("SELECT * FROM system_advice");
-    if (query.exec()) {
-        while (query.next()) {
-            QVariantList row;
-            for (int i = 0; i < query.record().count(); ++i)
-                row << query.value(i);
-            result << QVariant(row);
-        }
-    }
-    return result;
-}
+// 已删除所有system_advice相关实现
 
 // 专家建议相关
 // 添加专家建议
@@ -663,4 +608,122 @@ QVariantList DataBaseManager::GetExpertAdviceList(int expertId, int cropAreaId)
 
     qDebug() << "GetExpertAdviceList adviceList:" << adviceList;
     return adviceList;
+}
+
+// 传感器相关扩展函数实现
+QVariantList DataBaseManager::GetSAThData(int cropAreaId, const QString& startTime, const QString& endTime) {
+    QVariantList result;
+    QSqlQuery query(db);
+    query.prepare("SELECT content, receive_time FROM sensor WHERE service_id='SA_th' AND crop_id_virtual=:cropId AND receive_time >= :start AND receive_time <= :end");
+    query.bindValue(":cropId", cropAreaId);
+    query.bindValue(":start", startTime);
+    query.bindValue(":end", endTime);
+    if (query.exec()) {
+        while (query.next()) {
+            QString contentStr = query.value(0).toString();
+            QString receiveTime = query.value(1).toString();
+            QJsonDocument doc = QJsonDocument::fromJson(contentStr.toUtf8());
+            if (!doc.isObject()) continue;
+            QJsonObject props = doc.object();
+            QVariantList row;
+            row << props["temp"].toDouble();
+            row << props["stemp"].toDouble();
+            row << props["hum"].toDouble();
+            row << props["shum"].toDouble();
+            row << receiveTime;
+            result << QVariant(row);
+        }
+    }
+    return result;
+}
+
+QVariantList DataBaseManager::GetSASoilData(int cropAreaId, const QString& startTime, const QString& endTime) {
+    QVariantList result;
+    QSqlQuery query(db);
+    query.prepare("SELECT content, receive_time FROM sensor WHERE service_id='SA_soil' AND crop_id_virtual=:cropId AND receive_time >= :start AND receive_time <= :end");
+    query.bindValue(":cropId", cropAreaId);
+    query.bindValue(":start", startTime);
+    query.bindValue(":end", endTime);
+    if (query.exec()) {
+        while (query.next()) {
+            QString contentStr = query.value(0).toString();
+            QString receiveTime = query.value(1).toString();
+            QJsonDocument doc = QJsonDocument::fromJson(contentStr.toUtf8());
+            if (!doc.isObject()) continue;
+            QJsonObject props = doc.object();
+            QVariantList row;
+            row << props["N"].toDouble();
+            row << props["P"].toDouble();
+            row << props["K"].toDouble();
+            row << receiveTime;
+            result << QVariant(row);
+        }
+    }
+    return result;
+}
+
+QVariantMap DataBaseManager::GetLatestSoilAndThData(int cropAreaId) {
+    QVariantMap result;
+    // soil
+    QSqlQuery querySoil(db);
+    querySoil.prepare("SELECT content FROM sensor WHERE service_id='SA_soil' AND crop_id_virtual=:cropId ORDER BY receive_time DESC LIMIT 1");
+    querySoil.bindValue(":cropId", cropAreaId);
+    if (querySoil.exec() && querySoil.next()) {
+        QString contentStr = querySoil.value(0).toString();
+        QJsonDocument doc = QJsonDocument::fromJson(contentStr.toUtf8());
+        if (doc.isObject()) {
+            QJsonObject props = doc.object();
+            result["N"] = props["N"].toDouble();
+            result["P"] = props["P"].toDouble();
+            result["K"] = props["K"].toDouble();
+        }
+    }
+    // th
+    QSqlQuery queryTh(db);
+    queryTh.prepare("SELECT content FROM sensor WHERE service_id='SA_th' AND crop_id_virtual=:cropId ORDER BY receive_time DESC LIMIT 1");
+    queryTh.bindValue(":cropId", cropAreaId);
+    if (queryTh.exec() && queryTh.next()) {
+        QString contentStr = queryTh.value(0).toString();
+        QJsonDocument doc = QJsonDocument::fromJson(contentStr.toUtf8());
+        if (doc.isObject()) {
+            QJsonObject props = doc.object();
+            result["temp"] = props["temp"].toDouble();
+            result["stemp"] = props["stemp"].toDouble();
+            result["hum"] = props["hum"].toDouble();
+            result["shum"] = props["shum"].toDouble();
+        }
+    }
+    return result;
+}
+
+// 测试函数：测试新加的sensor相关接口
+void DataBaseManager::TestPrintSensorFunctions(int cropAreaId, const QString& startTime, const QString& endTime) {
+    qDebug() << "--- 测试GetSAThData ---";
+    QVariantList saThList = GetSAThData(cropAreaId, startTime, endTime);
+    for (const QVariant& rowVar : saThList) {
+        QVariantList row = rowVar.toList();
+        qDebug() << "temp:" << row.value(0).toDouble()
+                 << "stemp:" << row.value(1).toDouble()
+                 << "hum:" << row.value(2).toDouble()
+                 << "shum:" << row.value(3).toDouble()
+                 << "event_time:" << row.value(4).toString();
+    }
+    qDebug() << "--- 测试GetSASoilData ---";
+    QVariantList saSoilList = GetSASoilData(cropAreaId, startTime, endTime);
+    for (const QVariant& rowVar : saSoilList) {
+        QVariantList row = rowVar.toList();
+        qDebug() << "N:" << row.value(0).toDouble()
+                 << "P:" << row.value(1).toDouble()
+                 << "K:" << row.value(2).toDouble()
+                 << "event_time:" << row.value(3).toString();
+    }
+    qDebug() << "--- 测试GetLatestSoilAndThData ---";
+    QVariantMap latest = GetLatestSoilAndThData(cropAreaId);
+    qDebug() << "N:" << latest.value("N").toDouble()
+             << "P:" << latest.value("P").toDouble()
+             << "K:" << latest.value("K").toDouble()
+             << "temp:" << latest.value("temp").toDouble()
+             << "stemp:" << latest.value("stemp").toDouble()
+             << "hum:" << latest.value("hum").toDouble()
+             << "shum:" << latest.value("shum").toDouble();
 }

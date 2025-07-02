@@ -457,3 +457,8 @@ void ChangeInfoWindow::on_saveButton_clicked()
         }
     }
 }
+
+void ChangeInfoWindow::on_logoutButton_clicked()
+{
+    emit logOut();
+}

@@ -31,10 +31,13 @@ private:
 
 signals:
     void closeSignal();
+    void logOut();
+
 private slots:
     void on_cancelButton_clicked();
     void on_addCropButton_clicked();
     void on_saveButton_clicked();
+    void on_logoutButton_clicked();
 };
 
 #endif // CHANGEINFOWINDOW_H

@@ -71,6 +71,7 @@ public:
     QPushButton *saveButton;
     QPushButton *cancelButton;
     QSpacerItem *horizontalSpacer_3;
+    QPushButton *logoutButton;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -261,6 +262,11 @@ public:
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         buttonLayout->addItem(horizontalSpacer_3);
+
+        logoutButton = new QPushButton(centralwidget);
+        logoutButton->setObjectName("logoutButton");
+
+        buttonLayout->addWidget(logoutButton);
 
 
         mainLayout->addLayout(buttonLayout);
@@ -483,6 +489,21 @@ public:
 "           }\n"
 "           QPushButton:hover {\n"
 "             background-color: #d0d6e0;\n"
+"           }\n"
+"         ", nullptr));
+        logoutButton->setText(QCoreApplication::translate("ChangeInfoWindow", "\351\200\200\345\207\272\347\231\273\345\275\225", nullptr));
+        logoutButton->setStyleSheet(QCoreApplication::translate("ChangeInfoWindow", "\n"
+"           QPushButton {\n"
+"             background-color: #e74c3c;\n"
+"             color: white;\n"
+"             border-radius: 6px;\n"
+"             padding: 12px 30px;\n"
+"             font-size: 16px;\n"
+"             font-weight: bold;\n"
+"             border: none;\n"
+"           }\n"
+"           QPushButton:hover {\n"
+"             background-color: #c0392b;\n"
 "           }\n"
 "         ", nullptr));
     } // retranslateUi

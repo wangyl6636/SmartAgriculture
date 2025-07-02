@@ -34,6 +34,7 @@ void ExpertWindow::on_updateInfoButton_clicked()
     if(changeInfoWindow == nullptr){
         changeInfoWindow = new ChangeInfoWindow(expertId, 1);
         connect(changeInfoWindow, &ChangeInfoWindow::closeSignal, this, &ExpertWindow::ReShow);
+        connect(changeInfoWindow, &ChangeInfoWindow::logOut, this, &ExpertWindow::close);
     }
     changeInfoWindow->show();
 }

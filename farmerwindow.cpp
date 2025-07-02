@@ -283,6 +283,7 @@ void FarmerWindow::UpdateButtonClicked(){
     if(changeWindow==nullptr){
         changeWindow = new ChangeInfoWindow(currentFarmerId,0);
         connect(changeWindow,&ChangeInfoWindow::closeSignal,this,&FarmerWindow::ReShow);
+        connect(changeWindow, &ChangeInfoWindow::logOut, this, &FarmerWindow::close);
     }
     changeWindow->show();
 }

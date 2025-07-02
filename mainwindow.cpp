@@ -65,7 +65,7 @@ void MainWindow::on_pushButtonRegister_clicked()
 // 这种方式可以避免直接删除主窗口实例，保持应用程序的稳定性和一致性
 void MainWindow::ReShow(){
     this->show();
-    connect(rWindow, &RegisterWindow::closedSignal, this, &MainWindow::ReShow);
+    disconnect(rWindow, &RegisterWindow::closedSignal, this, &MainWindow::ReShow);
     delete rWindow;
     rWindow=nullptr;
 }
@@ -143,4 +143,11 @@ void MainWindow::on_pushButtonLogin_clicked()
     } else {
         QMessageBox::critical(this, "错误", "登录失败，请检查手机号和密码是否正确！");
     }
+}
+
+void MainWindow::onLogout() {
+    if (fWindow) { fWindow->close(); delete fWindow; fWindow = nullptr; }
+    if (eWindow) { eWindow->close(); delete eWindow; eWindow = nullptr; }
+    if (aWindow) { aWindow->close(); delete aWindow; aWindow = nullptr; }
+    this->show();
 }

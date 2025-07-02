@@ -4,6 +4,7 @@
 #include <QSqlDatabase>
 #include <QString>
 #include <QVariantList>
+#include <QVariantMap>
 
 class DataBaseManager
 {
@@ -48,11 +49,11 @@ public:
     QVariantList GetAllCropAreas(); // 获取所有作物区
 
     // 系统建议相关
-    bool AddSystemAdvice(int sensorId, int cropAreaId, const QString& fertilizerAdvice, const QString& irrigationAdvice); // 添加系统建议
-    bool UpdateSystemAdvice(int adviceId, const QString& fertilizerAdvice, const QString& irrigationAdvice); // 更新系统建议
-    bool DeleteSystemAdvice(int adviceId); // 删除系统建议
-    QVariantList GetSystemAdvices(int cropAreaId); // 获取指定作物区的系统建议
-    QVariantList GetAllSystemAdvices(); // 获取所有系统建议
+    //    bool AddSystemAdvice(int sensorId, int cropAreaId, const QString& fertilizerAdvice, const QString& irrigationAdvice); // 添加系统建议
+    //    bool UpdateSystemAdvice(int adviceId, const QString& fertilizerAdvice, const QString& irrigationAdvice); // 更新系统建议
+    //    bool DeleteSystemAdvice(int adviceId); // 删除系统建议
+    //    QVariantList GetSystemAdvices(int cropAreaId); // 获取指定作物区的系统建议
+    //    QVariantList GetAllSystemAdvices(); // 获取所有系统建议
 
     // 专家建议相关
     bool AddExpertAdvice(int expertId, int cropAreaId, const QString& title, const QString& content, const QString& category); // 添加专家建议
@@ -72,6 +73,10 @@ public:
     // 传感器相关
     QVariantList GetSensorInfo(int sensorId); // 获取指定条数信息
     QVariantList GetAllSensors(); // 获取所有传感器信息
+    // 新增：根据需求获取sensor表数据
+    QVariantList GetSAThData(int cropAreaId, const QString& startTime, const QString& endTime); // 获取指定作物区、时间段内所有SA_TH数据
+    QVariantList GetSASoilData(int cropAreaId, const QString& startTime, const QString& endTime); // 获取指定作物区、时间段内所有SA_soil数据
+    QVariantMap GetLatestSoilAndThData(int cropAreaId); // 获取指定作物区最新一条SA_soil和SA_th数据
 
     // 查询某专家对某作物区的所有建议
     QVariantList GetExpertAdviceList(int expertId, int cropAreaId);
@@ -89,6 +94,9 @@ public:
 
     //超时连接检测
     bool TestConnection();
+
+    // 测试函数：测试新加的sensor相关接口
+    void TestPrintSensorFunctions(int cropAreaId, const QString& startTime, const QString& endTime);
 
 private:
     QSqlDatabase db;

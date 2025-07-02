@@ -22,6 +22,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void onLogout();
+
 private slots:
     void on_pushButtonRegister_clicked();
     void ReShow();
