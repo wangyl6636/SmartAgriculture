@@ -18,6 +18,7 @@ ExpertWindow::ExpertWindow(int expertId, QWidget *parent)
     changeInfoWindow = nullptr;
     expertAdviceForm = nullptr;
     systemAdviceForm = nullptr;
+    sysWin = nullptr;
     loadCropAreas();
     connect(ui->refreshButton, &QPushButton::clicked, this, &ExpertWindow::loadCropAreas);
 
@@ -169,8 +170,11 @@ void ExpertWindow::addCropCard(const QVariantList &area, const QString &farmerPh
     int insertIdx = ui->cropsLayout->indexOf(ui->emptyLabel);
     ui->cropsLayout->insertWidget(insertIdx, card);
     // 按钮信号预留
-    connect(viewBtn, &QPushButton::clicked, this, [area]() {
-        QMessageBox::information(nullptr, "系统数据", "这里弹出系统数据窗口，作物区ID：" + area[0].toString());
+    connect(viewBtn, &QPushButton::clicked, this, [this, area]() {
+        std::vector<int> cropIds = { area[0].toInt() };
+        sysWin = new SystemWindow(cropIds);
+        sysWin->initialize();
+        sysWin->show();
     });
     connect(adviceBtn, &QPushButton::clicked, this, [this, area]() {
         if (expertAdviceForm != nullptr) {

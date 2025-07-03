@@ -1,6 +1,7 @@
 QT       += core gui
 QT       += sql
 QT       += concurrent
+QT       += charts
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++17
@@ -19,7 +20,10 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     registerwindow.cpp \
-    systemadviceform.cpp
+    systemadviceform.cpp \
+    systemwindow.cpp \
+    gauge_widget.cpp \
+    fertilizerprediction.cpp
 
 HEADERS += \
     adminwindow.h \
@@ -28,9 +32,11 @@ HEADERS += \
     expertadviceform.h \
     expertwindow.h \
     farmerwindow.h \
+    gauge_widget.h \
     mainwindow.h \
     registerwindow.h \
-    systemadviceform.h
+    systemadviceform.h \
+    systemwindow.h
 
 FORMS += \
     adminwindow.ui \
@@ -40,7 +46,8 @@ FORMS += \
     farmerwindow.ui \
     mainwindow.ui \
     registerwindow.ui \
-    systemadviceform.ui
+    systemadviceform.ui \
+    systemwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

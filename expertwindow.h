@@ -4,6 +4,8 @@
 #include "changeinfowindow.h"
 #include "expertadviceform.h"
 #include "systemadviceform.h"
+#include "systemwindow.h"
+
 #include <QMainWindow>
 
 namespace Ui {
@@ -30,6 +32,7 @@ private:
     ChangeInfoWindow *changeInfoWindow;
     ExpertAdviceForm *expertAdviceForm;
     SystemAdviceForm *systemAdviceForm;
+    SystemWindow *sysWin;
     // 动态加载作物区相关
     void loadCropAreas();
     void clearCropAreas();
