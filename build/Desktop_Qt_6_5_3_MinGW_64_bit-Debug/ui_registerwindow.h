@@ -44,7 +44,7 @@ public:
     QLabel *labelRole;
     QComboBox *comboBoxRole;
     QLabel *labelCropType;
-    QLineEdit *lineEditCropType;
+    QComboBox *comboBoxCropType;
     QLabel *labelArea;
     QLineEdit *lineEditArea;
     QLabel *labelAreaTip;
@@ -181,11 +181,28 @@ public:
 
         registerLayout->addWidget(labelCropType);
 
-        lineEditCropType = new QLineEdit(registerFrame);
-        lineEditCropType->setObjectName("lineEditCropType");
-        lineEditCropType->setVisible(true);
+        comboBoxCropType = new QComboBox(registerFrame);
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->addItem(QString());
+        comboBoxCropType->setObjectName("comboBoxCropType");
+        comboBoxCropType->setVisible(true);
+        comboBoxCropType->setStyleSheet(QString::fromUtf8("\n"
+"            border: 1px solid #bdbdbd;\n"
+"            border-radius: 6px;\n"
+"            font-size: 15px;\n"
+"            padding-left: 8px;\n"
+"          "));
 
-        registerLayout->addWidget(lineEditCropType);
+        registerLayout->addWidget(comboBoxCropType);
 
         labelArea = new QLabel(registerFrame);
         labelArea->setObjectName("labelArea");
@@ -289,6 +306,18 @@ public:
         comboBoxRole->setItemText(1, QCoreApplication::translate("RegisterWindow", "\344\270\223\345\256\266", nullptr));
 
         labelCropType->setText(QCoreApplication::translate("RegisterWindow", "\344\275\234\347\211\251\347\261\273\345\236\213", nullptr));
+        comboBoxCropType->setItemText(0, QCoreApplication::translate("RegisterWindow", "\347\224\230\350\224\227", nullptr));
+        comboBoxCropType->setItemText(1, QCoreApplication::translate("RegisterWindow", "\345\260\217\347\261\263/\350\260\267\345\255\220", nullptr));
+        comboBoxCropType->setItemText(2, QCoreApplication::translate("RegisterWindow", "\345\244\247\351\272\246", nullptr));
+        comboBoxCropType->setItemText(3, QCoreApplication::translate("RegisterWindow", "\346\260\264\347\250\273", nullptr));
+        comboBoxCropType->setItemText(4, QCoreApplication::translate("RegisterWindow", "\350\261\206\347\261\273", nullptr));
+        comboBoxCropType->setItemText(5, QCoreApplication::translate("RegisterWindow", "\347\203\237\350\215\211", nullptr));
+        comboBoxCropType->setItemText(6, QCoreApplication::translate("RegisterWindow", "\350\212\261\347\224\237", nullptr));
+        comboBoxCropType->setItemText(7, QCoreApplication::translate("RegisterWindow", "\347\216\211\347\261\263", nullptr));
+        comboBoxCropType->setItemText(8, QCoreApplication::translate("RegisterWindow", "\346\243\211\350\212\261", nullptr));
+        comboBoxCropType->setItemText(9, QCoreApplication::translate("RegisterWindow", "\345\260\217\351\272\246", nullptr));
+        comboBoxCropType->setItemText(10, QCoreApplication::translate("RegisterWindow", "\346\262\271\347\261\275\344\275\234\347\211\251", nullptr));
+
         labelArea->setText(QCoreApplication::translate("RegisterWindow", "\351\235\242\347\247\257\357\274\210\344\272\251\357\274\211", nullptr));
         labelAreaTip->setText(QCoreApplication::translate("RegisterWindow", "TextLabel", nullptr));
         labelLocation->setText(QCoreApplication::translate("RegisterWindow", "\345\234\260\347\202\271", nullptr));

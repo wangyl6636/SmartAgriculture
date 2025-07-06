@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QDateTime>
 #include <cmath>
+#include <QCloseEvent>
 
 // Qt UI Components
 #include <QMenuBar>
@@ -42,6 +43,7 @@
 SystemSuggestionDialog::SystemSuggestionDialog(SystemWindow* systemWindow, QWidget *parent)
     : QDialog(parent)
 {
+    (void)systemWindow;
     setWindowTitle("系统智能建议");
     setMinimumSize(480, 420);
 
@@ -97,15 +99,23 @@ void SystemSuggestionDialog::setSuggestionData(const std::vector<FertilizerPredi
 // =================================================================
 SystemWindow::SystemWindow(const std::vector<int>& userCropIds, QWidget *parent)
     : QMainWindow(parent),
-    m_userCropIds(userCropIds),
-    m_predictionSystemReady(false),
-    m_centralWidget(nullptr), m_mainSplitter(nullptr), m_chartSplitter(nullptr),
-    m_tempGauge(nullptr), m_humidityGauge(nullptr), m_cropAreaCombo(nullptr),
-    m_dataTypeCombo(nullptr), m_startTimeEdit(nullptr), m_endTimeEdit(nullptr),
-    m_loadButton(nullptr), m_systemSuggestionButton(nullptr), m_chartTooltip(nullptr),
-    m_chartView(nullptr), m_pieChartView(nullptr), m_chart(nullptr), m_pieChart(nullptr),
-    m_series(nullptr), m_pieSeries(nullptr), m_axisX(nullptr), m_axisY(nullptr),
-    m_autoRefreshTimer(nullptr), m_dashboardUpdateTimer(nullptr)
+      m_userCropIds(userCropIds),
+      m_retrainAction(nullptr), m_exportAction(nullptr), m_aboutAction(nullptr),
+      m_centralWidget(nullptr),
+      m_mainSplitter(nullptr), m_chartSplitter(nullptr),
+      m_tempGauge(nullptr), m_humidityGauge(nullptr),
+      m_cropAreaCombo(nullptr), m_dataTypeCombo(nullptr),
+      m_startTimeEdit(nullptr), m_endTimeEdit(nullptr),
+      m_loadButton(nullptr), m_systemSuggestionButton(nullptr),
+      m_autoRefreshCheckBox(nullptr), m_refreshIntervalSpinBox(nullptr),
+      m_chartTooltip(nullptr),
+      m_chartView(nullptr), m_pieChartView(nullptr),
+      m_chart(nullptr), m_pieChart(nullptr),
+      m_series(nullptr), m_pieSeries(nullptr),
+      m_axisX(nullptr), m_axisY(nullptr),
+      m_autoRefreshTimer(nullptr), m_dashboardUpdateTimer(nullptr),
+      m_predictionSystem(nullptr),
+      m_predictionSystemReady(false)
 {}
 
 bool SystemWindow::initialize()
@@ -506,7 +516,8 @@ void SystemWindow::loadAndDisplayData()
         case 6: val = row[2].toDouble(); break;
         }
         points.append(QPointF(dt.toMSecsSinceEpoch(), val));
-        if (val < minV) minV = val; if (val > maxV) maxV = val;
+        if (val < minV) { minV = val; }
+        if (val > maxV) { maxV = val; }
     }
 
     m_series->replace(points);
@@ -579,4 +590,10 @@ QString SystemWindow::getCurrentEnvironmentData()
         .arg(latestData["temp"].toDouble()).arg(latestData["hum"].toDouble()).arg(latestData["shum"].toDouble())
         .arg(soilType).arg(cropType)
         .arg(latestData["N"].toDouble()).arg(latestData["K"].toDouble()).arg(latestData["P"].toDouble());
+}
+
+void SystemWindow::closeEvent(QCloseEvent *event)
+{
+    emit closeSignal();
+    QMainWindow::closeEvent(event);
 }

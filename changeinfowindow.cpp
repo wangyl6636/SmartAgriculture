@@ -9,6 +9,10 @@
 #include <QDebug>
 #include <QCloseEvent>
 #include <QRegularExpression>
+#include <QComboBox>
+#include <QPushButton>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 
 ChangeInfoWindow::ChangeInfoWindow(int id, int roleIndex, QWidget *parent)
@@ -208,9 +212,12 @@ void ChangeInfoWindow::AddCropCard(const QVariantMap &area){
         mainLayout->setSpacing(14);
         // 作物类型
         QLabel *typeLabel = new QLabel("作物类型：");
-        QLineEdit *typeEdit = new QLineEdit(area["crop_type"].toString());
-        typeEdit->setPlaceholderText("请输入作物类型");
-        typeEdit->setStyleSheet("QLineEdit { border: 1.5px solid #e0e6ed; border-radius: 7px; padding: 8px 12px; font-size: 15px; background: #fff; }");
+        QComboBox *typeCombo = new QComboBox();
+        QStringList cropTypes = {"甘蔗", "小米/谷子", "大麦", "水稻", "豆类", "烟草", "花生", "玉米", "棉花", "小麦", "油籽作物"};
+        typeCombo->addItems(cropTypes);
+        int idx = cropTypes.indexOf(area["crop_type"].toString());
+        if(idx >= 0) typeCombo->setCurrentIndex(idx);
+        typeCombo->setStyleSheet("QComboBox { border: 1.5px solid #e0e6ed; border-radius: 7px; padding: 8px 12px; font-size: 15px; background: #fff; }");
         // 面积
         QLabel *areaLabel = new QLabel("面积（亩）：");
         QDoubleSpinBox *areaSpin = new QDoubleSpinBox();
@@ -230,7 +237,7 @@ void ChangeInfoWindow::AddCropCard(const QVariantMap &area){
         descEdit->setStyleSheet("QTextEdit { border: 1.5px solid #e0e6ed; border-radius: 7px; padding: 8px 12px; font-size: 15px; background: #fff; }");
         // 布局
         mainLayout->addWidget(typeLabel);
-        mainLayout->addWidget(typeEdit);
+        mainLayout->addWidget(typeCombo);
         mainLayout->addWidget(areaLabel);
         mainLayout->addWidget(areaSpin);
         mainLayout->addWidget(locLabel);
@@ -251,7 +258,7 @@ void ChangeInfoWindow::AddCropCard(const QVariantMap &area){
         connect(cancelBtn, &QPushButton::clicked, &dialog, &QDialog::reject);
         // 保存
         connect(saveBtn, &QPushButton::clicked, &dialog, [&, this]() {
-            QString newType = typeEdit->text().trimmed();
+            QString newType = typeCombo->currentText().trimmed();
             float newArea = areaSpin->value();
             QString newLoc = locEdit->text().trimmed();
             QString newDetail = descEdit->toPlainText().trimmed();
@@ -310,9 +317,10 @@ void ChangeInfoWindow::on_addCropButton_clicked(){
     mainLayout->setSpacing(14);
     // 作物类型
     QLabel *typeLabel = new QLabel("作物类型：");
-    QLineEdit *typeEdit = new QLineEdit();
-    typeEdit->setPlaceholderText("请输入作物类型");
-    typeEdit->setStyleSheet("QLineEdit { border: 1.5px solid #e0e6ed; border-radius: 7px; padding: 8px 12px; font-size: 15px; background: #fff; }");
+    QComboBox *typeCombo = new QComboBox();
+    QStringList cropTypes = {"甘蔗", "小米/谷子", "大麦", "水稻", "豆类", "烟草", "花生", "玉米", "棉花", "小麦", "油籽作物"};
+    typeCombo->addItems(cropTypes);
+    typeCombo->setStyleSheet("QComboBox { border: 1.5px solid #e0e6ed; border-radius: 7px; padding: 8px 12px; font-size: 15px; background: #fff; }");
     // 面积
     QLabel *areaLabel = new QLabel("面积（亩）：");
     QDoubleSpinBox *areaSpin = new QDoubleSpinBox();
@@ -331,7 +339,7 @@ void ChangeInfoWindow::on_addCropButton_clicked(){
     descEdit->setStyleSheet("QTextEdit { border: 1.5px solid #e0e6ed; border-radius: 7px; padding: 8px 12px; font-size: 15px; background: #fff; }");
     // 布局
     mainLayout->addWidget(typeLabel);
-    mainLayout->addWidget(typeEdit);
+    mainLayout->addWidget(typeCombo);
     mainLayout->addWidget(areaLabel);
     mainLayout->addWidget(areaSpin);
     mainLayout->addWidget(locLabel);
@@ -352,7 +360,7 @@ void ChangeInfoWindow::on_addCropButton_clicked(){
     connect(cancelBtn, &QPushButton::clicked, &dialog, &QDialog::reject);
     // 保存
     connect(saveBtn, &QPushButton::clicked, &dialog, [&, this]() {
-        QString newType = typeEdit->text().trimmed();
+        QString newType = typeCombo->currentText().trimmed();
         float newArea = areaSpin->value();
         QString newLoc = locEdit->text().trimmed();
         QString newDetail = descEdit->toPlainText().trimmed();

@@ -2,6 +2,7 @@
 #define FARMERWINDOW_H
 #include "changeinfowindow.h"
 #include "systemadviceform.h"
+#include "systemwindow.h"
 
 #include <QMainWindow>
 #include <QMap>
@@ -23,6 +24,7 @@ private slots:
     void UpdateButtonClicked();
     void ReShow();
     void on_suggestButton_clicked();
+    void on_viewSystemAdviceButton_clicked();
 
 private:
     int currentFarmerId;
@@ -33,6 +35,8 @@ private:
 
     // 系统建议界面
     SystemAdviceForm *systemAdviceForm;
+
+    SystemWindow *sysWin;
 
     // 类别颜色映射
     QMap<QString, QString> categoryColors = {

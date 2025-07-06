@@ -115,7 +115,7 @@ void RegisterWindow::on_pushButtonRegister_clicked()
         bool success;
         if(role == "farmer"){
             //获取农户相关作物区信息
-            QString cropType = ui->lineEditCropType->text();
+            QString cropType = ui->comboBoxCropType->currentText();
             float area = ui->lineEditArea->text().toFloat();
             QString location = ui->lineEditLocation->text();
             QString detail = ui->lineEditDetail->text();
@@ -179,7 +179,7 @@ void RegisterWindow::on_comboBoxRole_activated(int index)
         ui->lineEditField->setVisible(true);
 
         ui->labelCropType->setVisible(false);
-        ui->lineEditCropType->setVisible(false);
+        ui->comboBoxCropType->setVisible(false);
         ui->labelArea->setVisible(false);
         ui->lineEditArea->setVisible(false);
         ui->labelLocation->setVisible(false);
@@ -192,7 +192,7 @@ void RegisterWindow::on_comboBoxRole_activated(int index)
         ui->lineEditField->setVisible(false);
 
         ui->labelCropType->setVisible(true);
-        ui->lineEditCropType->setVisible(true);
+        ui->comboBoxCropType->setVisible(true);
         ui->labelArea->setVisible(true);
         ui->lineEditArea->setVisible(true);
         ui->labelLocation->setVisible(true);

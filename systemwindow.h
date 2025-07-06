@@ -49,6 +49,9 @@ public:
     bool initialize();
     void refreshSuggestion(SystemSuggestionDialog* dialog);
 
+    signals:
+        void closeSignal();
+
 private slots:
     void onLoadDataClicked();
     void onRefreshClicked();
@@ -62,6 +65,9 @@ private slots:
     void updateDashboard();
     void onStartTimeChanged(const QDateTime &dateTime);
     void onEndTimeChanged(const QDateTime &dateTime);
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private:
     void initStyleSheet();

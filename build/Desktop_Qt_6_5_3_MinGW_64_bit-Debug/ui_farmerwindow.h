@@ -32,6 +32,7 @@ public:
     QLabel *titleLabel;
     QSpacerItem *horizontalSpacer;
     QPushButton *updateInfoButton;
+    QPushButton *viewSystemAdviceButton;
     QPushButton *suggestButton;
     QScrollArea *suggestionArea;
     QWidget *scrollAreaWidgetContents;
@@ -66,6 +67,11 @@ public:
         updateInfoButton->setObjectName("updateInfoButton");
 
         navLayout->addWidget(updateInfoButton);
+
+        viewSystemAdviceButton = new QPushButton(centralwidget);
+        viewSystemAdviceButton->setObjectName("viewSystemAdviceButton");
+
+        navLayout->addWidget(viewSystemAdviceButton);
 
         suggestButton = new QPushButton(centralwidget);
         suggestButton->setObjectName("suggestButton");
@@ -137,6 +143,28 @@ public:
 "            }\n"
 "          ", nullptr));
         updateInfoButton->setText(QCoreApplication::translate("FarmerWindow", "\344\270\252\344\272\272\344\277\241\346\201\257\347\256\241\347\220\206", nullptr));
+        viewSystemAdviceButton->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
+"            QPushButton {\n"
+"              background-color: #f39c12;\n"
+"              color: white;\n"
+"              border-radius: 6px;\n"
+"              padding: 10px 24px;\n"
+"              font-size: 15px;\n"
+"              font-weight: bold;\n"
+"              border: none;\n"
+"              box-shadow: 0 2px 8px #f8c471;\n"
+"            }\n"
+"            QPushButton:hover {\n"
+"              background-color: #e67e22;\n"
+"            }\n"
+"            QPushButton:pressed {\n"
+"              background-color: #ca7c1b;\n"
+"            }\n"
+"          ", nullptr));
+        viewSystemAdviceButton->setText(QCoreApplication::translate("FarmerWindow", "\346\237\245\347\234\213\347\263\273\347\273\237\345\273\272\350\256\256", nullptr));
+#if QT_CONFIG(tooltip)
+        viewSystemAdviceButton->setToolTip(QCoreApplication::translate("FarmerWindow", "\347\202\271\345\207\273\346\237\245\347\234\213\347\263\273\347\273\237\344\270\272\346\202\250\346\216\250\351\200\201\347\232\204\345\273\272\350\256\256", nullptr));
+#endif // QT_CONFIG(tooltip)
         suggestButton->setStyleSheet(QCoreApplication::translate("FarmerWindow", "\n"
 "            QPushButton {\n"
 "              background-color: #27ae60;\n"

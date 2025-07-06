@@ -60,6 +60,12 @@ void ExpertWindow::ReShow(){
         delete systemAdviceForm;
         systemAdviceForm = nullptr;
     }
+
+    if(sysWin != nullptr){
+        disconnect(sysWin, &SystemWindow::closeSignal, this, &ExpertWindow::ReShow);
+        delete sysWin;
+        sysWin = nullptr;
+    }
 }
 
 void ExpertWindow::loadCropAreas()
@@ -172,9 +178,16 @@ void ExpertWindow::addCropCard(const QVariantList &area, const QString &farmerPh
     // 按钮信号预留
     connect(viewBtn, &QPushButton::clicked, this, [this, area]() {
         std::vector<int> cropIds = { area[0].toInt() };
+        if (sysWin) {
+            disconnect(sysWin, &SystemWindow::closeSignal, this, &ExpertWindow::ReShow);
+            delete sysWin;
+            sysWin = nullptr;
+        }
         sysWin = new SystemWindow(cropIds);
+        connect(sysWin, &SystemWindow::closeSignal, this, &ExpertWindow::ReShow);
         sysWin->initialize();
         sysWin->show();
+        this->hide();
     });
     connect(adviceBtn, &QPushButton::clicked, this, [this, area]() {
         if (expertAdviceForm != nullptr) {

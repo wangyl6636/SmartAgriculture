@@ -23,9 +23,12 @@ FarmerWindow::FarmerWindow(int farmerId, QWidget *parent)
 
     changeWindow = nullptr;
     systemAdviceForm = nullptr;
+    sysWin = nullptr;
 
     //连接槽函数
     connect(ui->updateInfoButton,&QPushButton::clicked,this, &FarmerWindow::UpdateButtonClicked);
+    connect(ui->viewSystemAdviceButton, &QPushButton::clicked, this, &FarmerWindow::on_viewSystemAdviceButton_clicked);
+    connect(ui->suggestButton, &QPushButton::clicked, this, &FarmerWindow::on_suggestButton_clicked);
 }
 
 FarmerWindow::~FarmerWindow()
@@ -288,13 +291,28 @@ void FarmerWindow::UpdateButtonClicked(){
     changeWindow->show();
 }
 
-void FarmerWindow::on_suggestButton_clicked() {
-    this->hide();
-    if (systemAdviceForm == nullptr) {
-        systemAdviceForm = new SystemAdviceForm(currentFarmerId,0);
-        connect(systemAdviceForm, &SystemAdviceForm::closeSignal, this, &FarmerWindow::ReShow);
+void FarmerWindow::on_viewSystemAdviceButton_clicked()
+{
+    // 查询当前农户所有作物区
+    DataBaseManager &db = DataBaseManager::instance();
+    QVariantList cropAreas = db.GetCropAreas(currentFarmerId);
+    std::vector<int> cropIds;
+    int colCount = 6; // id, farmer_id, crop_type, area, location, detail
+    
+    for(int i=0;i<cropAreas.size();i+=colCount){
+        cropIds.push_back(cropAreas[i].toInt());
     }
-    systemAdviceForm->show();
+
+    if (sysWin) {
+        disconnect(sysWin, &SystemWindow::closeSignal, this, &FarmerWindow::ReShow);
+        delete sysWin;
+        sysWin = nullptr;
+    }
+    sysWin = new SystemWindow(cropIds);
+    connect(sysWin, &SystemWindow::closeSignal, this, &FarmerWindow::ReShow);
+    sysWin->initialize();
+    sysWin->show();
+    this->hide();
 }
 
 void FarmerWindow::ReShow(){
@@ -304,12 +322,27 @@ void FarmerWindow::ReShow(){
         delete changeWindow;
         changeWindow = nullptr;
     }
-
     if(systemAdviceForm != nullptr){
         disconnect(systemAdviceForm, &SystemAdviceForm::closeSignal, this, &FarmerWindow::ReShow);
         delete systemAdviceForm;
         systemAdviceForm = nullptr;
     }
-
+    if(sysWin != nullptr){
+        disconnect(sysWin, &SystemWindow::closeSignal, this, &FarmerWindow::ReShow);
+        delete sysWin;
+        sysWin = nullptr;
+    }
     refreshSuggestions();
+}
+
+void FarmerWindow::on_suggestButton_clicked()
+{
+    this->hide();
+    if (systemAdviceForm == nullptr) {
+        systemAdviceForm = new SystemAdviceForm(currentFarmerId,0);
+        connect(systemAdviceForm, &SystemAdviceForm::closeSignal, this, &FarmerWindow::ReShow);
+    }
+    systemAdviceForm->show();
+    systemAdviceForm->raise();
+    systemAdviceForm->activateWindow();
 }

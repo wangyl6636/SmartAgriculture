@@ -201,10 +201,29 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEditCropType">
+        <widget class="QComboBox" name="comboBoxCropType">
          <property name="visible">
           <bool>true</bool>
          </property>
+         <property name="styleSheet">
+          <string notr="true">
+            border: 1px solid #bdbdbd;
+            border-radius: 6px;
+            font-size: 15px;
+            padding-left: 8px;
+          </string>
+         </property>
+         <item><property name="text"><string>甘蔗</string></property></item>
+         <item><property name="text"><string>小米/谷子</string></property></item>
+         <item><property name="text"><string>大麦</string></property></item>
+         <item><property name="text"><string>水稻</string></property></item>
+         <item><property name="text"><string>豆类</string></property></item>
+         <item><property name="text"><string>烟草</string></property></item>
+         <item><property name="text"><string>花生</string></property></item>
+         <item><property name="text"><string>玉米</string></property></item>
+         <item><property name="text"><string>棉花</string></property></item>
+         <item><property name="text"><string>小麦</string></property></item>
+         <item><property name="text"><string>油籽作物</string></property></item>
         </widget>
        </item>
        <item>
