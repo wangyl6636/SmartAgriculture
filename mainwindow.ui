@@ -14,34 +14,46 @@
    <string>智慧农业登录</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="centralLayout">
-    <item>
-     <spacer name="verticalSpacerTop">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>80</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <widget class="QFrame" name="loginFrame">
       <property name="minimumSize">
        <size>
-        <width>360</width>
+        <width>320</width>
         <height>340</height>
        </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding"/>
       </property>
       <property name="styleSheet">
        <string notr="true">
         QFrame#loginFrame {
             background: #fff;
-            border-radius: 16px;
+            border-radius: 20px;
             border: 1px solid #e0e0e0;
+            box-shadow: 0 4px 24px rgba(60,60,60,0.08);
         }
        </string>
       </property>
@@ -52,6 +64,69 @@
        <enum>QFrame::Raised</enum>
       </property>
       <layout class="QVBoxLayout" name="loginLayout">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+       <property name="leftMargin">
+        <number>24</number>
+       </property>
+       <property name="rightMargin">
+        <number>24</number>
+       </property>
+       <property name="topMargin">
+        <number>24</number>
+       </property>
+       <property name="bottomMargin">
+        <number>24</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="closeLayout">
+         <item>
+          <spacer name="closeSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonClose">
+           <property name="minimumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">
+             QPushButton {
+                 background: transparent;
+                 color: #888;
+                 font-size: 20px;
+                 border: none;
+                 border-radius: 12px;
+             }
+             QPushButton:hover {
+                 background: #f44336;
+                 color: #fff;
+             }
+            </string>
+           </property>
+           <property name="text">
+            <string>×</string>
+           </property>
+           <property name="toolTip">
+            <string>关闭</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item>
         <widget class="QLabel" name="labelTitle">
          <property name="minimumSize">
@@ -68,9 +143,10 @@
          </property>
          <property name="styleSheet">
           <string notr="true">
-           font-size: 26px;
+           font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+           font-size: 32px;
            font-weight: bold;
-           color: #2e7d32;
+           color: #1b5e20;
            margin-bottom: 18px;
           </string>
          </property>
@@ -85,7 +161,7 @@
        <item>
         <widget class="QLabel" name="labelName">
          <property name="styleSheet">
-          <string notr="true">font-size: 15px; color: #555;</string>
+          <string notr="true">font-family: '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 15px; color: #555;</string>
          </property>
          <property name="text">
           <string>姓名</string>
@@ -96,10 +172,12 @@
         <widget class="QLineEdit" name="lineEditName">
          <property name="styleSheet">
           <string notr="true">
+           font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
            border: 1px solid #bdbdbd;
-           border-radius: 6px;
-           padding-left: 8px;
-           font-size: 15px;
+           border-radius: 8px;
+           padding-left: 10px;
+           font-size: 16px;
+           min-height: 38px;
           </string>
          </property>
         </widget>
@@ -107,7 +185,7 @@
        <item>
         <widget class="QLabel" name="labelPhone">
          <property name="styleSheet">
-          <string notr="true">font-size: 15px; color: #555;</string>
+          <string notr="true">font-family: '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 15px; color: #555;</string>
          </property>
          <property name="text">
           <string>手机号</string>
@@ -118,10 +196,12 @@
         <widget class="QLineEdit" name="lineEditPhone">
          <property name="styleSheet">
           <string notr="true">
+           font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
            border: 1px solid #bdbdbd;
-           border-radius: 6px;
-           padding-left: 8px;
-           font-size: 15px;
+           border-radius: 8px;
+           padding-left: 10px;
+           font-size: 16px;
+           min-height: 38px;
           </string>
          </property>
         </widget>
@@ -129,7 +209,7 @@
        <item>
         <widget class="QLabel" name="labelPassword">
          <property name="styleSheet">
-          <string notr="true">font-size: 15px; color: #555;</string>
+          <string notr="true">font-family: '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 15px; color: #555;</string>
          </property>
          <property name="text">
           <string>密码</string>
@@ -140,10 +220,12 @@
         <widget class="QLineEdit" name="lineEditPassword">
          <property name="styleSheet">
           <string notr="true">
+           font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
            border: 1px solid #bdbdbd;
-           border-radius: 6px;
-           padding-left: 8px;
-           font-size: 15px;
+           border-radius: 8px;
+           padding-left: 10px;
+           font-size: 16px;
+           min-height: 38px;
           </string>
          </property>
          <property name="echoMode">
@@ -154,7 +236,7 @@
        <item>
         <widget class="QLabel" name="labelRole">
          <property name="styleSheet">
-          <string notr="true">font-size: 15px; color: #555;</string>
+          <string notr="true">font-family: '微软雅黑', 'Microsoft YaHei', sans-serif; font-size: 15px; color: #555;</string>
          </property>
          <property name="text">
           <string>角色</string>
@@ -165,10 +247,13 @@
         <widget class="QComboBox" name="comboBoxRole">
          <property name="styleSheet">
           <string notr="true">
+           font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
            border: 1px solid #bdbdbd;
-           border-radius: 6px;
-           font-size: 15px;
-           padding-left: 8px;
+           border-radius: 8px;
+           font-size: 16px;
+           padding-left: 10px;
+           min-height: 38px;
+           background: #fff;
           </string>
          </property>
          <item>
@@ -189,55 +274,89 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButtonLogin">
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-  background-color: #43a047;
-  color: #fff;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
+        <layout class="QHBoxLayout" name="buttonLayout">
+         <property name="spacing">
+          <number>12</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="pushButtonLogin">
+           <property name="minimumWidth">
+            <number>100</number>
+           </property>
+           <property name="maximumWidth">
+            <number>180</number>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed"/>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+background-color: #43a047;
+color: #fff;
+border-radius: 8px;
+font-size: 18px;
+font-weight: bold;
+min-height: 38px;
+padding-left: 24px;
+padding-right: 24px;
 }
 QPushButton:hover {
   background-color: #388e3c;
   border: 2px solid #66bb6a;
 }</string>
-         </property>
-         <property name="text">
-          <string>登录</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButtonRegister">
-         <property name="styleSheet">
-          <string notr="true">QPushButton {
-  background-color: #1976d2;
-  color: #fff;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
+           </property>
+           <property name="text">
+            <string>登录</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButtonRegister">
+           <property name="minimumWidth">
+            <number>100</number>
+           </property>
+           <property name="maximumWidth">
+            <number>180</number>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed"/>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QPushButton {
+font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+background-color: #1976d2;
+color: #fff;
+border-radius: 8px;
+font-size: 18px;
+font-weight: bold;
+min-height: 38px;
+padding-left: 24px;
+padding-right: 24px;
 }
 QPushButton:hover {
   background-color: #1565c0;
   border: 2px solid #42a5f5;
 }</string>
-         </property>
-         <property name="text">
-          <string>注册</string>
-         </property>
-        </widget>
+           </property>
+           <property name="text">
+            <string>注册</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <widget class="QPushButton" name="pushButtonSwitchMode">
          <property name="styleSheet">
           <string notr="true">QPushButton {
-  background: transparent;
-  color: #1976d2;
-  border: none;
-  font-size: 15px;
-  text-decoration: underline;
-  font-weight: bold;
+font-family: '微软雅黑', 'Microsoft YaHei', sans-serif;
+background: transparent;
+color: #1976d2;
+border: none;
+font-size: 15px;
+text-decoration: underline;
+font-weight: bold;
 }
 QPushButton:hover {
   color: #0d47a1;
@@ -252,20 +371,14 @@ QPushButton:hover {
       </layout>
      </widget>
     </item>
-    <item>
-     <spacer name="verticalSpacerBottom">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>100</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
    </layout>
+   <property name="styleSheet">
+    <string notr="true">
+     QWidget#centralwidget {
+         background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #f5f6fa, stop:1 #e9ecef);
+     }
+    </string>
+   </property>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

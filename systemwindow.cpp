@@ -36,10 +36,11 @@
 #include <QtSql>
 #include <QtCharts>
 
-
-// =================================================================
-// SystemSuggestionDialog Implementation
-// =================================================================
+/**
+ * @brief 系统智能建议对话框构造函数，初始化UI
+ * @param systemWindow 父窗口指针
+ * @param parent 父窗口
+ */
 SystemSuggestionDialog::SystemSuggestionDialog(SystemWindow* systemWindow, QWidget *parent)
     : QDialog(parent)
 {
@@ -69,6 +70,11 @@ SystemSuggestionDialog::SystemSuggestionDialog(SystemWindow* systemWindow, QWidg
     });
 }
 
+/**
+ * @brief 设置系统建议内容
+ * @param results 预测结果
+ * @param wateringTip 灌溉建议
+ */
 void SystemSuggestionDialog::setSuggestionData(const std::vector<FertilizerPrediction::PredictionResult> &results, const QString &wateringTip)
 {
     QString htmlContent;
@@ -97,10 +103,15 @@ void SystemSuggestionDialog::setSuggestionData(const std::vector<FertilizerPredi
 // =================================================================
 // SystemWindow Implementation
 // =================================================================
+/**
+ * @brief 系统分析窗口构造函数，初始化成员变量
+ * @param userCropIds 当前用户可访问的作物区ID列表
+ * @param parent 父窗口指针
+ */
 SystemWindow::SystemWindow(const std::vector<int>& userCropIds, QWidget *parent)
     : QMainWindow(parent),
       m_userCropIds(userCropIds),
-      m_retrainAction(nullptr), m_exportAction(nullptr), m_aboutAction(nullptr),
+      m_retrainAction(nullptr), m_exportCsvAction(nullptr), m_exportImageAction(nullptr), m_aboutAction(nullptr),
       m_centralWidget(nullptr),
       m_mainSplitter(nullptr), m_chartSplitter(nullptr),
       m_tempGauge(nullptr), m_humidityGauge(nullptr),
@@ -115,9 +126,14 @@ SystemWindow::SystemWindow(const std::vector<int>& userCropIds, QWidget *parent)
       m_axisX(nullptr), m_axisY(nullptr),
       m_autoRefreshTimer(nullptr), m_dashboardUpdateTimer(nullptr),
       m_predictionSystem(nullptr),
-      m_predictionSystemReady(false)
+      m_predictionSystemReady(false),
+      m_timeUpdateTimer(nullptr)
 {}
 
+/**
+ * @brief 初始化窗口，加载UI、数据库、模型等
+ * @return 是否初始化成功
+ */
 bool SystemWindow::initialize()
 {
     setWindowTitle("智慧农业数据可视化与决策系统");
@@ -138,14 +154,20 @@ bool SystemWindow::initialize()
         populateCropAreaCombo();
     }
 
-    if (m_endTimeEdit) m_endTimeEdit->setDateTime(QDateTime::currentDateTime());
-    if (m_startTimeEdit) m_startTimeEdit->setDateTime(QDateTime::currentDateTime().addDays(-7));
+    QDateTime now = QDateTime::currentDateTime();
+    if (m_endTimeEdit) m_endTimeEdit->setDateTime(now);
+    if (m_startTimeEdit) m_startTimeEdit->setDateTime(now.addDays(-7));
 
     m_autoRefreshTimer = new QTimer(this);
     connect(m_autoRefreshTimer, &QTimer::timeout, this, &SystemWindow::updateDataAuto);
+    m_autoRefreshTimer->setInterval(60000); // 自动刷新间隔固定为60秒
     m_dashboardUpdateTimer = new QTimer(this);
     connect(m_dashboardUpdateTimer, &QTimer::timeout, this, &SystemWindow::updateDashboard);
     m_dashboardUpdateTimer->start(5000);
+
+    // 新增：实时时间定时器
+    m_timeUpdateTimer = new QTimer(this);
+    m_timeUpdateTimer->start(10000); // 10秒刷新一次
 
     initFertilizerPredictionSystem();
 
@@ -161,6 +183,9 @@ bool SystemWindow::initialize()
 
 SystemWindow::~SystemWindow() {}
 
+/**
+ * @brief 初始化全局样式表
+ */
 void SystemWindow::initStyleSheet()
 {
     qApp->setStyleSheet(
@@ -180,12 +205,17 @@ void SystemWindow::initStyleSheet()
         );
 }
 
+/**
+ * @brief 初始化菜单栏
+ */
 void SystemWindow::initMenu()
 {
     auto fileMenu = menuBar()->addMenu("文件(&F)");
-    m_exportAction = new QAction(QIcon::fromTheme("document-save"), "导出当前图表数据(&E)...", this);
+    m_exportCsvAction = new QAction(QIcon::fromTheme("document-save"), "导出当前图表数据(&E)...", this);
+    m_exportImageAction = new QAction(QIcon::fromTheme("image-x-generic"), "导出图表为图片(&I)...", this);
     m_retrainAction = new QAction(QIcon::fromTheme("system-run"), "重新训练模型(&R)...", this);
-    fileMenu->addAction(m_exportAction);
+    fileMenu->addAction(m_exportCsvAction);
+    fileMenu->addAction(m_exportImageAction);
     fileMenu->addSeparator();
     fileMenu->addAction(m_retrainAction);
     fileMenu->addSeparator();
@@ -195,6 +225,9 @@ void SystemWindow::initMenu()
     helpMenu->addAction(m_aboutAction);
 }
 
+/**
+ * @brief 初始化主UI布局
+ */
 void SystemWindow::initUI()
 {
     m_centralWidget = new QWidget(this);
@@ -225,10 +258,31 @@ void SystemWindow::initUI()
     controlLayout->addWidget(new QLabel("作物区域:"), 0, 0); m_cropAreaCombo = new QComboBox(); controlLayout->addWidget(m_cropAreaCombo, 0, 1);
     controlLayout->addWidget(new QLabel("数据类型:"), 1, 0); m_dataTypeCombo = new QComboBox(); controlLayout->addWidget(m_dataTypeCombo, 1, 1);
     m_dataTypeCombo->addItems({"温度", "空气湿度", "土壤湿度", "土壤温度", "氮 (N)", "磷 (P)", "钾 (K)"});
-    controlLayout->addWidget(new QLabel("开始时间:"), 2, 0); m_startTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime()); controlLayout->addWidget(m_startTimeEdit, 2, 1);
-    controlLayout->addWidget(new QLabel("结束时间:"), 3, 0); m_endTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime()); controlLayout->addWidget(m_endTimeEdit, 3, 1);
-    m_startTimeEdit->setDisplayFormat("yyyy-MM-dd hh:mm"); m_endTimeEdit->setDisplayFormat("yyyy-MM-dd hh:mm");
+    controlLayout->addWidget(new QLabel("开始时间:"), 2, 0); m_startTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime());
+    m_startTimeEdit->setDisplayFormat("yyyy-MM-dd hh:mm");
+    m_startTimeEdit->setCalendarPopup(true);
+    m_startTimeEdit->setMaximumDateTime(QDateTime::currentDateTime());
+    controlLayout->addWidget(m_startTimeEdit, 2, 1);
+    controlLayout->addWidget(new QLabel("结束时间:"), 3, 0); m_endTimeEdit = new QDateTimeEdit(QDateTime::currentDateTime());
+    m_endTimeEdit->setDisplayFormat("yyyy-MM-dd hh:mm");
+    m_endTimeEdit->setCalendarPopup(true);
+    m_endTimeEdit->setMaximumDateTime(QDateTime::currentDateTime());
+    controlLayout->addWidget(m_endTimeEdit, 3, 1);
     m_loadButton = new QPushButton(QIcon::fromTheme("document-open"), " 查询数据"); controlLayout->addWidget(m_loadButton, 4, 0, 1, 2);
+    // 自动刷新相关控件
+    m_autoRefreshCheckBox = new QCheckBox("自动刷新折线图");
+    m_refreshIntervalSpinBox = new QSpinBox();
+    m_refreshIntervalSpinBox->setRange(5, 3600);
+    m_refreshIntervalSpinBox->setValue(60); // 固定为60秒
+    m_refreshIntervalSpinBox->setSuffix(" 秒");
+    m_refreshIntervalSpinBox->setEnabled(false); // 禁用编辑
+    QLabel* intervalLabel = new QLabel("刷新间隔:");
+    QPushButton* manualRefreshButton = new QPushButton(QIcon::fromTheme("view-refresh"), " 立即刷新");
+    int row = 5;
+    controlLayout->addWidget(m_autoRefreshCheckBox, row, 0, 1, 2);
+    controlLayout->addWidget(intervalLabel, row+1, 0);
+    controlLayout->addWidget(m_refreshIntervalSpinBox, row+1, 1);
+    controlLayout->addWidget(manualRefreshButton, row+2, 0, 1, 2);
     leftLayout->addWidget(controlGroup);
 
     leftLayout->addStretch();
@@ -296,9 +350,12 @@ void SystemWindow::setupConnections()
     if(m_startTimeEdit) connect(m_startTimeEdit, &QDateTimeEdit::dateTimeChanged, this, &SystemWindow::onStartTimeChanged);
     if(m_endTimeEdit) connect(m_endTimeEdit, &QDateTimeEdit::dateTimeChanged, this, &SystemWindow::onEndTimeChanged);
     if(m_retrainAction) connect(m_retrainAction, &QAction::triggered, this, [this](){ onRetrainModelClicked(false); });
-    if(m_exportAction) connect(m_exportAction, &QAction::triggered, this, &SystemWindow::onExportDataClicked);
+    if(m_exportCsvAction) connect(m_exportCsvAction, &QAction::triggered, this, &SystemWindow::onExportDataClicked);
+    if(m_exportImageAction) connect(m_exportImageAction, &QAction::triggered, this, &SystemWindow::onExportImageClicked);
     if(m_aboutAction) connect(m_aboutAction, &QAction::triggered, this, &SystemWindow::showAboutDialog);
     if(m_series) connect(m_series, &QLineSeries::hovered, this, &SystemWindow::onSeriesHovered);
+    // 自动刷新信号槽
+    connect(m_autoRefreshCheckBox, &QCheckBox::toggled, this, &SystemWindow::onAutoRefreshToggled);
 }
 
 bool SystemWindow::initDatabase()
@@ -374,6 +431,11 @@ void SystemWindow::onRetrainModelClicked(bool isFirstRun)
 void SystemWindow::onSystemSuggestionClicked()
 {
     if (!m_predictionSystemReady) { QMessageBox::critical(this, "错误", "预测模型未就绪。"); return; }
+     QString inputData = getCurrentEnvironmentData();
+    if (inputData.isEmpty()) {
+        QMessageBox::warning(this, "数据不足", "无法获取当前作物区域的完整环境数据以进行预测。");
+        return;
+    }
     auto dialog = new SystemSuggestionDialog(this, this);
     refreshSuggestion(dialog);
     dialog->exec();
@@ -397,8 +459,26 @@ void SystemWindow::onLoadDataClicked()
 }
 
 void SystemWindow::onRefreshClicked() { onLoadDataClicked(); }
-void SystemWindow::onAutoRefreshToggled(bool enabled) { if(m_autoRefreshTimer) { if(enabled) m_autoRefreshTimer->start(m_refreshIntervalSpinBox->value()*1000); else m_autoRefreshTimer->stop(); } }
-void SystemWindow::updateDataAuto() { if(m_endTimeEdit) m_endTimeEdit->setDateTime(QDateTime::currentDateTime()); onLoadDataClicked(); }
+void SystemWindow::onAutoRefreshToggled(bool enabled) {
+    if(m_autoRefreshTimer) {
+        if(enabled) m_autoRefreshTimer->start(); // 启动定时器，使用setInterval设定的60秒
+        else m_autoRefreshTimer->stop();
+    }
+}
+void SystemWindow::updateDataAuto() {
+    if (m_startTimeEdit && m_endTimeEdit) {
+        QDateTime fixedStart = m_startTimeEdit->dateTime(); // 固定不变
+        QDateTime now = QDateTime::currentDateTime(); // 作为新的结束时间
+        m_endTimeEdit->setDateTime(now);
+        // 直接用fixedStart和now刷新数据
+        loadAndDisplayData(fixedStart, now);
+        return;
+    } else if (m_endTimeEdit) {
+        QDateTime now = QDateTime::currentDateTime();
+        m_endTimeEdit->setDateTime(now);
+    }
+    onLoadDataClicked();
+}
 void SystemWindow::onStartTimeChanged(const QDateTime &dt) { if(m_endTimeEdit) m_endTimeEdit->setMinimumDateTime(dt); }
 void SystemWindow::onEndTimeChanged(const QDateTime &dt) { if(m_startTimeEdit) m_startTimeEdit->setMaximumDateTime(dt); }
 
@@ -429,6 +509,21 @@ void SystemWindow::onExportDataClicked()
     statusBar()->showMessage("数据已成功导出至 " + fileName, 5000);
 }
 
+void SystemWindow::onExportImageClicked()
+{
+    if (!m_chartView) return;
+    QString defaultFileName = QString("export_chart_%1.png").arg(QDate::currentDate().toString("yyyyMMdd"));
+    QString fileName = QFileDialog::getSaveFileName(this, "导出图表为图片", defaultFileName, "PNG图片 (*.png)");
+    if (fileName.isEmpty()) return;
+
+    QPixmap p = m_chartView->grab();
+    if (p.save(fileName, "PNG")) {
+        statusBar()->showMessage("图表已成功导出至 " + fileName, 5000);
+    } else {
+        QMessageBox::critical(this, "导出失败", "无法保存图表图片。");
+    }
+}
+
 void SystemWindow::showAboutDialog()
 {
     QMessageBox::about(this, "关于本系统",
@@ -447,7 +542,7 @@ void SystemWindow::updateDashboard()
     int cropAreaId = m_cropAreaCombo->currentData().toInt();
     QVariantMap latestData = DataBaseManager::instance().GetLatestSoilAndThData(cropAreaId);
     if(m_tempGauge) m_tempGauge->setValue(latestData.value("temp", 0).toDouble());
-    if(m_humidityGauge) m_humidityGauge->setValue(latestData.value("shum", 0).toDouble());
+    if(m_humidityGauge) m_humidityGauge->setValue(latestData.value("shum", 0).toDouble()*100);
 }
 
 void SystemWindow::populateCropAreaCombo()
@@ -483,50 +578,87 @@ void SystemWindow::populateCropAreaCombo()
     }
 }
 
-void SystemWindow::loadAndDisplayData()
+void SystemWindow::loadAndDisplayData(const QDateTime &start, const QDateTime &end)
 {
     if (!m_series || !m_cropAreaCombo || m_cropAreaCombo->currentIndex() < 0) return;
     m_series->clear();
 
     int cropAreaId = m_cropAreaCombo->currentData().toInt();
     int dataTypeIndex = m_dataTypeCombo->currentIndex();
-    QString start = m_startTimeEdit->dateTime().toString(Qt::ISODate);
-    QString end = m_endTimeEdit->dateTime().toString(Qt::ISODate);
+    QString startStr = start.toString(Qt::ISODate);
+    QString endStr = end.toString(Qt::ISODate);
 
     QVariantList dataList;
-    if (dataTypeIndex < 4) dataList = DataBaseManager::instance().GetSAThData(cropAreaId, start, end);
-    else dataList = DataBaseManager::instance().GetSASoilData(cropAreaId, start, end);
+    if (dataTypeIndex < 4) dataList = DataBaseManager::instance().GetSAThData(cropAreaId, startStr, endStr);
+    else dataList = DataBaseManager::instance().GetSASoilData(cropAreaId, startStr, endStr);
 
     QList<QPointF> points;
     double minV = 1e9, maxV = -1e9;
-    for (const QVariant& rowVar : dataList) {
-        QVariantList row = rowVar.toList();
-        QDateTime dt = QDateTime::fromString(row.last().toString(), "yyyy-MM-ddTHH:mm:ss");
-        if (!dt.isValid()) dt = QDateTime::fromString(row.last().toString(), Qt::ISODate);
-        if(!dt.isValid()) continue;
 
-        double val = 0.0;
-        switch(dataTypeIndex) {
-        case 0: val = row[0].toDouble(); break;
-        case 1: val = row[2].toDouble(); break;
-        case 2: val = row[3].toDouble(); break;
-        case 3: val = row[1].toDouble(); break;
-        case 4: val = row[0].toDouble(); break;
-        case 5: val = row[1].toDouble(); break;
-        case 6: val = row[2].toDouble(); break;
+    // 判断时间跨度
+    qint64 days = start.daysTo(end);
+    if (days >= 5) {
+        // 按小时分组取平均
+        QMap<qint64, QList<double>> groupMap; // key: 小时起点时间戳, value: 数据值列表
+        for (const QVariant& rowVar : dataList) {
+            QVariantList row = rowVar.toList();
+            QDateTime dt = QDateTime::fromString(row.last().toString(), "yyyy-MM-ddTHH:mm:ss");
+            if (!dt.isValid()) dt = QDateTime::fromString(row.last().toString(), Qt::ISODate);
+            if(!dt.isValid()) continue;
+            double val = 0.0;
+            switch(dataTypeIndex) {
+            case 0: val = row[0].toDouble(); break;
+            case 1: val = row[2].toDouble(); break;
+            case 2: val = row[3].toDouble(); break;
+            case 3: val = row[1].toDouble(); break;
+            case 4: val = row[0].toDouble(); break;
+            case 5: val = row[1].toDouble(); break;
+            case 6: val = row[2].toDouble(); break;
+            }
+            // 取整到小时
+            QDateTime hour = dt;
+            hour.setTime(QTime(dt.time().hour(), 0, 0));
+            qint64 hourMs = hour.toMSecsSinceEpoch();
+            groupMap[hourMs].append(val);
         }
-        points.append(QPointF(dt.toMSecsSinceEpoch(), val));
-        if (val < minV) { minV = val; }
-        if (val > maxV) { maxV = val; }
+        for (auto it = groupMap.begin(); it != groupMap.end(); ++it) {
+            double sum = 0;
+            for (double v : it.value()) sum += v;
+            double avg = it.value().isEmpty() ? 0 : sum / it.value().size();
+            points.append(QPointF(it.key(), avg));
+            if (avg < minV) minV = avg;
+            if (avg > maxV) maxV = avg;
+        }
+    } else {
+        // 原有方式
+        for (const QVariant& rowVar : dataList) {
+            QVariantList row = rowVar.toList();
+            QDateTime dt = QDateTime::fromString(row.last().toString(), "yyyy-MM-ddTHH:mm:ss");
+            if (!dt.isValid()) dt = QDateTime::fromString(row.last().toString(), Qt::ISODate);
+            if(!dt.isValid()) continue;
+            double val = 0.0;
+            switch(dataTypeIndex) {
+            case 0: val = row[0].toDouble(); break;
+            case 1: val = row[2].toDouble(); break;
+            case 2: val = row[3].toDouble(); break;
+            case 3: val = row[1].toDouble(); break;
+            case 4: val = row[0].toDouble(); break;
+            case 5: val = row[1].toDouble(); break;
+            case 6: val = row[2].toDouble(); break;
+            }
+            points.append(QPointF(dt.toMSecsSinceEpoch(), val));
+            if (val < minV) { minV = val; }
+            if (val > maxV) { maxV = val; }
+        }
     }
 
     m_series->replace(points);
-    m_axisX->setRange(m_startTimeEdit->dateTime(), m_endTimeEdit->dateTime());
+    m_axisX->setRange(start, end);
     if(!points.isEmpty()) m_axisY->setRange(minV - (maxV-minV)*0.1 - 1, maxV + (maxV-minV)*0.1 + 1); else m_axisY->setRange(0, 100);
     m_chart->setTitle(m_cropAreaCombo->currentText() + " - " + m_dataTypeCombo->currentText());
     m_axisY->setTitleText(m_dataTypeCombo->currentText().split('(').first());
 
-    updatePieChart(cropAreaId, m_startTimeEdit->dateTime(), m_endTimeEdit->dateTime());
+    updatePieChart(cropAreaId, start, end);
 }
 
 void SystemWindow::updatePieChart(int cropAreaId, const QDateTime &startTime, const QDateTime &endTime)
@@ -560,6 +692,17 @@ void SystemWindow::updatePieChart(int cropAreaId, const QDateTime &startTime, co
     m_pieChart->setTitle("土壤 N-P-K 平均含量");
 }
 
+QString SystemWindow::translateCropType(const QString& chineseCropType)
+{
+    static const QMap<QString, QString> translationMap = {
+        {"甘蔗", "Sugarcane"}, {"小米/谷子", "Millets"}, {"大麦", "Barley"},
+        {"水稻", "Paddy"},   {"豆类", "Pulses"},     {"烟草", "Tobacco"},
+        {"花生", "Ground Nuts"}, {"玉米", "Maize"},      {"棉花", "Cotton"},
+        {"小麦", "Wheat"},   {"油籽作物", "Oil seeds"}
+    };
+    return translationMap.value(chineseCropType, "Wheat");
+}
+
 QString SystemWindow::getCurrentEnvironmentData()
 {
     if (m_cropAreaCombo == nullptr || m_cropAreaCombo->currentIndex() < 0) return "";
@@ -571,12 +714,12 @@ QString SystemWindow::getCurrentEnvironmentData()
     }
 
     QString soilType = "Loamy";
-    QString cropType = "Wheat";
+    QString cropTypeChinese = "Wheat";
     QVariantList allAreas = DataBaseManager::instance().GetAllCropAreas();
     for(const auto& areaVar : allAreas) {
         QVariantList areaDetails = areaVar.toList();
-        if(areaDetails.first().toInt() == cropAreaId) {
-            cropType = areaDetails[2].toString();
+        if(areaDetails.size() >= 6 && areaDetails.first().toInt() == cropAreaId) {
+            cropTypeChinese = areaDetails[2].toString();
             QString detail = areaDetails[5].toString().toLower();
             if (detail.contains("sandy") || detail.contains("沙")) soilType = "Sandy";
             else if (detail.contains("clay") || detail.contains("黏")) soilType = "Clay";
@@ -586,9 +729,11 @@ QString SystemWindow::getCurrentEnvironmentData()
         }
     }
 
+    QString cropTypeEnglish = translateCropType(cropTypeChinese);
+
     return QString("%1 %2 %3 %4 %5 %6 %7 %8")
         .arg(latestData["temp"].toDouble()).arg(latestData["hum"].toDouble()).arg(latestData["shum"].toDouble())
-        .arg(soilType).arg(cropType)
+        .arg(soilType).arg(cropTypeEnglish)
         .arg(latestData["N"].toDouble()).arg(latestData["K"].toDouble()).arg(latestData["P"].toDouble());
 }
 
@@ -596,4 +741,10 @@ void SystemWindow::closeEvent(QCloseEvent *event)
 {
     emit closeSignal();
     QMainWindow::closeEvent(event);
+}
+
+// 新增：无参版本，兼容原有调用
+void SystemWindow::loadAndDisplayData() {
+    if (!m_startTimeEdit || !m_endTimeEdit) return;
+    loadAndDisplayData(m_startTimeEdit->dateTime(), m_endTimeEdit->dateTime());
 }

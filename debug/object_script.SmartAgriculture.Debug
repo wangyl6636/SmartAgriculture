@@ -11,6 +11,7 @@ debug/systemadviceform.o
 debug/systemwindow.o
 debug/gauge_widget.o
 debug/fertilizerprediction.o
+debug/qrc_icon.o
 debug/moc_adminwindow.o
 debug/moc_changeinfowindow.o
 debug/moc_expertadviceform.o

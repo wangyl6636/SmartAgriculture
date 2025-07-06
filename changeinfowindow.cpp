@@ -14,17 +14,20 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 
-
+/**
+ * @brief 构造函数，初始化UI、加载用户信息和作物区/领域
+ * @param id 用户id
+ * @param roleIndex 角色索引（0-农户，1-专家）
+ * @param parent 父窗口指针
+ */
 ChangeInfoWindow::ChangeInfoWindow(int id, int roleIndex, QWidget *parent)
     : QMainWindow(parent), id(id), roleIndex(roleIndex)
     , ui(new Ui::ChangeInfoWindow)
 {
     ui->setupUi(this);
-
-    // 初始化界面
+    // 初始化界面，切换到对应角色页面
     ui->roleSpecificStack->setCurrentIndex(roleIndex);
-
-    // 获取用户基本信息
+    // 获取用户基本信息并填充
     DataBaseManager &db = DataBaseManager::instance();
     int userId;
     if(roleIndex == 0) {
@@ -32,29 +35,33 @@ ChangeInfoWindow::ChangeInfoWindow(int id, int roleIndex, QWidget *parent)
     } else {
         userId = db.GetUserIdByExpertId(id);
     }
-
     if (userId != -1) {
         QVariantList info = db.GetUserInfo(userId);
         if (info.size() >= 4) {
             QString name = info.at(1).toString();
             QString phone = info.at(2).toString();
-            QString password = info.at(3).toString();
-
             ui->nameEdit->setText(name);
             ui->phoneEdit->setText(phone);
-            ui->passwordEdit->setText(password);
+            ui->passwordEdit->clear();
+            ui->confirmPasswordEdit->clear();
         }
     }
-
     // 初始化特定UI
     InitSpecificUi();
 }
 
+/**
+ * @brief 析构函数，释放UI资源
+ */
 ChangeInfoWindow::~ChangeInfoWindow()
 {
     delete ui;
 }
 
+/**
+ * @brief 重写关闭事件，处理未保存修改，必要时弹窗提示保存
+ * @param event 关闭事件指针
+ */
 void ChangeInfoWindow::closeEvent(QCloseEvent *event)
 {
     // 检查是否有未保存更改
@@ -69,19 +76,18 @@ void ChangeInfoWindow::closeEvent(QCloseEvent *event)
         QVariantList info = db.GetUserInfo(userId);
         QString oldName = info.value(1).toString();
         QString oldPhone = info.value(2).toString();
-        QString oldPassword = info.value(3).toString();
-        changed = (name != oldName) || (phone != oldPhone) || (password != oldPassword);
+        changed = (name != oldName) || (phone != oldPhone);
+        if (!password.isEmpty()) changed = true;
     }else{
         DataBaseManager &db = DataBaseManager::instance();
         int userId = db.GetUserIdByExpertId(id);
         QVariantList info = db.GetUserInfo(userId);
         QString oldName = info.value(1).toString();
         QString oldPhone = info.value(2).toString();
-        QString oldPassword = info.value(3).toString();
         QString oldField = db.GetExpertField(id);
-        changed = (name != oldName) || (phone != oldPhone) || (password != oldPassword) || (field != oldField);
+        changed = (name != oldName) || (phone != oldPhone) || (field != oldField);
+        if (!password.isEmpty()) changed = true;
     }
-
     if (changed) {
         QMessageBox::StandardButton reply = QMessageBox::question(
             this, "有未保存的更改", "检测到您的基本信息已修改，是否保存？",
@@ -100,16 +106,24 @@ void ChangeInfoWindow::closeEvent(QCloseEvent *event)
             return;
         }
     } else {
-        emit closeSignal();
+        if (!isLogout) {
+            emit closeSignal();
+        }
         QMainWindow::closeEvent(event);
     }
 }
 
+/**
+ * @brief 取消按钮点击槽，关闭窗口
+ */
 void ChangeInfoWindow::on_cancelButton_clicked()
 {
     this->close();
 }
 
+/**
+ * @brief 初始化特定角色UI，农户加载作物区，专家加载领域
+ */
 void ChangeInfoWindow::InitSpecificUi()
 {
     if (roleIndex == 0) {
@@ -121,6 +135,9 @@ void ChangeInfoWindow::InitSpecificUi()
     }
 }
 
+/**
+ * @brief 加载农户作物区信息，并动态生成卡片
+ */
 void ChangeInfoWindow::LoadCropAreas(){
     // 清空原有作物区卡片
     ClearCropArea();
@@ -132,7 +149,6 @@ void ChangeInfoWindow::LoadCropAreas(){
         return;
     }
     ui->noCropLabel->setVisible(false);
-
     for (int i = 0; i + colCount - 1 < cropAreas.size(); i += colCount) {
         QVariantMap area;
         area["id"] = cropAreas[i + 0];
@@ -145,8 +161,10 @@ void ChangeInfoWindow::LoadCropAreas(){
     }
 }
 
+/**
+ * @brief 清空所有作物区卡片，仅保留空提示标签
+ */
 void ChangeInfoWindow::ClearCropArea(){
-    // 删除所有作物区卡片（不删空状态标签）
     QLayout *layout = ui->cropAreaLayout;
     for (int i = layout->count() - 1; i >= 0; --i) {
         QLayoutItem *item = layout->itemAt(i);
@@ -158,15 +176,23 @@ void ChangeInfoWindow::ClearCropArea(){
     }
 }
 
+/**
+ * @brief 添加作物区卡片到界面，支持编辑和删除操作
+ * @param area 作物区信息（QVariantMap）
+ */
 void ChangeInfoWindow::AddCropCard(const QVariantMap &area){
-    // 创建卡片容器
+    // 创建卡片容器及内容
     QWidget *card = new QWidget();
-    card->setMinimumHeight(110); // 设置卡片最小高度
+    card->setMinimumHeight(110);
     card->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     card->setStyleSheet("background: #fff; border-radius: 16px; border: 2px solid #e0e6ed; margin-bottom: 22px; padding: 22px 18px 18px 22px;");
     QVBoxLayout *vbox = new QVBoxLayout(card);
     vbox->setContentsMargins(0, 0, 0, 0);
     vbox->setSpacing(10);
+    // 作物区ID
+    QLabel *idLabel = new QLabel(QString("作物区ID：%1").arg(area["id"].toString()));
+    idLabel->setStyleSheet("font-size: 13px; color: #888; margin-bottom: 2px;");
+    vbox->addWidget(idLabel);
     // 顶部信息行
     QHBoxLayout *hbox = new QHBoxLayout();
     hbox->setSpacing(18);
@@ -199,7 +225,6 @@ void ChangeInfoWindow::AddCropCard(const QVariantMap &area){
     // 优化滚动区域显示空间
     ui->cropAreaScroll->setMinimumHeight(400);
     ui->cropAreaScroll->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-
     // 编辑按钮弹窗逻辑
     connect(editBtn, &QPushButton::clicked, this, [this, area]() {
         QDialog dialog(this);
@@ -280,10 +305,9 @@ void ChangeInfoWindow::AddCropCard(const QVariantMap &area){
         });
         dialog.exec();
     });
-
     // 删除按钮逻辑
     connect(delBtn, &QPushButton::clicked, this, [this, area]() {
-        // 检查当前作物区数量
+        // 检查当前作物区数量，至少保留一个
         DataBaseManager &db = DataBaseManager::instance();
         QVariantList cropAreas = db.GetCropAreas(id); // id为farmerId
         int colCount = 6;
@@ -306,6 +330,9 @@ void ChangeInfoWindow::AddCropCard(const QVariantMap &area){
     });
 }
 
+/**
+ * @brief 添加作物区按钮点击槽，弹窗输入并添加新作物区
+ */
 void ChangeInfoWindow::on_addCropButton_clicked(){
     QDialog dialog(this);
     dialog.setWindowTitle("添加作物区");
@@ -382,6 +409,9 @@ void ChangeInfoWindow::on_addCropButton_clicked(){
     dialog.exec();
 }
 
+/**
+ * @brief 保存按钮点击槽，校验并保存用户信息
+ */
 void ChangeInfoWindow::on_saveButton_clicked()
 {
     // 获取当前输入
@@ -390,7 +420,6 @@ void ChangeInfoWindow::on_saveButton_clicked()
     QString password = ui->passwordEdit->text();
     QString confirmPassword = ui->confirmPasswordEdit->text();
     QString field = ui->expertiseEdit->text().trimmed();
-
     // 获取原始信息
     DataBaseManager &db = DataBaseManager::instance();
     int userId = (roleIndex == 0) ? db.GetUserIdByFarmerId(id) : db.GetUserIdByExpertId(id);
@@ -399,36 +428,64 @@ void ChangeInfoWindow::on_saveButton_clicked()
     QString oldPhone = info.value(2).toString();
     QString oldPassword = info.value(3).toString();
     QString oldField = db.GetExpertField(id);
-
-    // 检查是否有变化
-    bool changed = (name != oldName) || (phone != oldPhone) || (password != oldPassword);
+    // 检查是否有变化（密码只在有输入时才算变化）
+    bool changed = (name != oldName) || (phone != oldPhone);
     if(roleIndex == 1){
-        changed = (name != oldName) || (phone != oldPhone) || (password != oldPassword) || (field != oldField);
+        changed = (name != oldName) || (phone != oldPhone) || (field != oldField);
     }
-
+    if (!password.isEmpty()) changed = true;
     if (!changed) {
-        QMessageBox::information(this, "无更改", "信息未发生变化，无需保存。");
+        QMessageBox msgBox;
+        msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+        msgBox.setWindowTitle("无更改");
+        msgBox.setText("信息未发生变化，无需保存。");
+        msgBox.exec();
         return;
     }
     // 校验
-    if (name.isEmpty() || phone.isEmpty() || password.isEmpty()) {
-        QMessageBox::warning(this, "警告", "姓名、电话、密码不能为空！");
+    if (name.isEmpty() || phone.isEmpty()) {
+        QMessageBox msgBox;
+        msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+        msgBox.setWindowTitle("警告");
+        msgBox.setText("姓名、电话不能为空！");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
         return;
     }
     // 手机号格式校验
     QRegularExpression reg("^1\\d{10}$");
     if (!reg.match(phone).hasMatch()) {
-        QMessageBox::warning(this, "警告", "手机号格式不正确，请输入11位以1开头的手机号！");
+        QMessageBox msgBox;
+        msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+        msgBox.setWindowTitle("警告");
+        msgBox.setText("手机号格式不正确，请输入11位以1开头的手机号！");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
         return;
     }
     // 手机号唯一性校验（允许自己原手机号，但不允许与他人重复）
     if (phone != oldPhone && db.IsUserExists(phone)) {
-        QMessageBox::warning(this, "警告", "该手机号已被注册，请使用其他手机号！");
+        QMessageBox msgBox;
+        msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+        msgBox.setWindowTitle("警告");
+        msgBox.setText("该手机号已被注册，请使用其他手机号！");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
         return;
     }
-    if (password != confirmPassword) {
-        QMessageBox::warning(this, "警告", "两次输入的密码不一致！");
-        return;
+    // 密码校验（只有有输入时才校验）
+    QString hashedPassword = oldPassword;
+    if (!password.isEmpty()) {
+        if (password != confirmPassword) {
+            QMessageBox msgBox;
+            msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+            msgBox.setWindowTitle("警告");
+            msgBox.setText("两次输入的密码不一致！");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+            return;
+        }
+        hashedPassword = DataBaseManager::hashPassword(password);
     }
     // 更新数据库
     QString role = info.value(4).toString();
@@ -436,37 +493,72 @@ void ChangeInfoWindow::on_saveButton_clicked()
     if(roleIndex == 1){
         // 专家，开启事务
         if(!db.BeginTransaction()){
-            QMessageBox::critical(this, "保存失败", "无法开启数据库事务！");
+            QMessageBox msgBox;
+            msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+            msgBox.setWindowTitle("保存失败");
+            msgBox.setText("无法开启数据库事务！");
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
             return;
         }
-        ok = db.UpdateUser(userId, name, phone, password, role);
+        ok = db.UpdateUser(userId, name, phone, hashedPassword, role);
         if(ok){
             ok = db.UpdateExpert(id, field);
         }
         if(ok){
             if(!db.CommitTransaction()){
                 db.RollbackTransaction();
-                QMessageBox::critical(this, "保存失败", "提交事务失败！");
+                QMessageBox msgBox;
+                msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+                msgBox.setWindowTitle("保存失败");
+                msgBox.setText("提交事务失败！");
+                msgBox.setIcon(QMessageBox::Critical);
+                msgBox.exec();
                 return;
             }
-            QMessageBox::information(this, "保存成功", "用户信息已更新！");
+            QMessageBox msgBox;
+            msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+            msgBox.setWindowTitle("保存成功");
+            msgBox.setText("用户信息已更新！");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
         }else{
             db.RollbackTransaction();
-            QMessageBox::critical(this, "保存失败", "更新失败，请重试！\n" + db.GetLastError());
+            QMessageBox msgBox;
+            msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+            msgBox.setWindowTitle("保存失败");
+            msgBox.setText("更新失败，请重试！\n" + db.GetLastError());
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
         }
         return;
     }else{
         // 农户，单表更新
-        ok = db.UpdateUser(userId, name, phone, password, role);
+        ok = db.UpdateUser(userId, name, phone, hashedPassword, role);
         if (ok) {
-            QMessageBox::information(this, "保存成功", "用户信息已更新！");
+            QMessageBox msgBox;
+            msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+            msgBox.setWindowTitle("保存成功");
+            msgBox.setText("用户信息已更新！");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
         } else {
-            QMessageBox::critical(this, "保存失败", "更新失败，请重试！\n" + db.GetLastError());
+            QMessageBox msgBox;
+            msgBox.setStyleSheet("QPushButton { color: black; background: white; }");
+            msgBox.setWindowTitle("保存失败");
+            msgBox.setText("更新失败，请重试！\n" + db.GetLastError());
+            msgBox.setIcon(QMessageBox::Critical);
+            msgBox.exec();
         }
     }
 }
 
+/**
+ * @brief 登出按钮点击槽，发送登出信号并关闭窗口
+ */
 void ChangeInfoWindow::on_logoutButton_clicked()
 {
+    isLogout = true;
     emit logOut();
+    this->close();
 }

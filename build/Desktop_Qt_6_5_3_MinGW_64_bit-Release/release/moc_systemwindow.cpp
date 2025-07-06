@@ -39,13 +39,15 @@ namespace {
 struct qt_meta_stringdata_CLASSSystemWindowENDCLASS_t {};
 static constexpr auto qt_meta_stringdata_CLASSSystemWindowENDCLASS = QtMocHelpers::stringData(
     "SystemWindow",
-    "onLoadDataClicked",
+    "closeSignal",
     "",
+    "onLoadDataClicked",
     "onRefreshClicked",
     "onSystemSuggestionClicked",
     "onRetrainModelClicked",
     "isFirstRun",
     "onExportDataClicked",
+    "onExportImageClicked",
     "showAboutDialog",
     "onSeriesHovered",
     "point",
@@ -60,59 +62,65 @@ static constexpr auto qt_meta_stringdata_CLASSSystemWindowENDCLASS = QtMocHelper
 );
 #else  // !QT_MOC_HAS_STRING_DATA
 struct qt_meta_stringdata_CLASSSystemWindowENDCLASS_t {
-    uint offsetsAndSizes[38];
+    uint offsetsAndSizes[42];
     char stringdata0[13];
-    char stringdata1[18];
+    char stringdata1[12];
     char stringdata2[1];
-    char stringdata3[17];
-    char stringdata4[26];
-    char stringdata5[22];
-    char stringdata6[11];
-    char stringdata7[20];
-    char stringdata8[16];
-    char stringdata9[16];
-    char stringdata10[6];
-    char stringdata11[6];
-    char stringdata12[21];
-    char stringdata13[8];
-    char stringdata14[15];
-    char stringdata15[16];
-    char stringdata16[19];
-    char stringdata17[9];
-    char stringdata18[17];
+    char stringdata3[18];
+    char stringdata4[17];
+    char stringdata5[26];
+    char stringdata6[22];
+    char stringdata7[11];
+    char stringdata8[20];
+    char stringdata9[21];
+    char stringdata10[16];
+    char stringdata11[16];
+    char stringdata12[6];
+    char stringdata13[6];
+    char stringdata14[21];
+    char stringdata15[8];
+    char stringdata16[15];
+    char stringdata17[16];
+    char stringdata18[19];
+    char stringdata19[9];
+    char stringdata20[17];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(sizeof(qt_meta_stringdata_CLASSSystemWindowENDCLASS_t::offsetsAndSizes) + ofs), len 
 Q_CONSTINIT static const qt_meta_stringdata_CLASSSystemWindowENDCLASS_t qt_meta_stringdata_CLASSSystemWindowENDCLASS = {
     {
         QT_MOC_LITERAL(0, 12),  // "SystemWindow"
-        QT_MOC_LITERAL(13, 17),  // "onLoadDataClicked"
-        QT_MOC_LITERAL(31, 0),  // ""
-        QT_MOC_LITERAL(32, 16),  // "onRefreshClicked"
-        QT_MOC_LITERAL(49, 25),  // "onSystemSuggestionClicked"
-        QT_MOC_LITERAL(75, 21),  // "onRetrainModelClicked"
-        QT_MOC_LITERAL(97, 10),  // "isFirstRun"
-        QT_MOC_LITERAL(108, 19),  // "onExportDataClicked"
-        QT_MOC_LITERAL(128, 15),  // "showAboutDialog"
-        QT_MOC_LITERAL(144, 15),  // "onSeriesHovered"
-        QT_MOC_LITERAL(160, 5),  // "point"
-        QT_MOC_LITERAL(166, 5),  // "state"
-        QT_MOC_LITERAL(172, 20),  // "onAutoRefreshToggled"
-        QT_MOC_LITERAL(193, 7),  // "enabled"
-        QT_MOC_LITERAL(201, 14),  // "updateDataAuto"
-        QT_MOC_LITERAL(216, 15),  // "updateDashboard"
-        QT_MOC_LITERAL(232, 18),  // "onStartTimeChanged"
-        QT_MOC_LITERAL(251, 8),  // "dateTime"
-        QT_MOC_LITERAL(260, 16)   // "onEndTimeChanged"
+        QT_MOC_LITERAL(13, 11),  // "closeSignal"
+        QT_MOC_LITERAL(25, 0),  // ""
+        QT_MOC_LITERAL(26, 17),  // "onLoadDataClicked"
+        QT_MOC_LITERAL(44, 16),  // "onRefreshClicked"
+        QT_MOC_LITERAL(61, 25),  // "onSystemSuggestionClicked"
+        QT_MOC_LITERAL(87, 21),  // "onRetrainModelClicked"
+        QT_MOC_LITERAL(109, 10),  // "isFirstRun"
+        QT_MOC_LITERAL(120, 19),  // "onExportDataClicked"
+        QT_MOC_LITERAL(140, 20),  // "onExportImageClicked"
+        QT_MOC_LITERAL(161, 15),  // "showAboutDialog"
+        QT_MOC_LITERAL(177, 15),  // "onSeriesHovered"
+        QT_MOC_LITERAL(193, 5),  // "point"
+        QT_MOC_LITERAL(199, 5),  // "state"
+        QT_MOC_LITERAL(205, 20),  // "onAutoRefreshToggled"
+        QT_MOC_LITERAL(226, 7),  // "enabled"
+        QT_MOC_LITERAL(234, 14),  // "updateDataAuto"
+        QT_MOC_LITERAL(249, 15),  // "updateDashboard"
+        QT_MOC_LITERAL(265, 18),  // "onStartTimeChanged"
+        QT_MOC_LITERAL(284, 8),  // "dateTime"
+        QT_MOC_LITERAL(293, 16)   // "onEndTimeChanged"
     },
     "SystemWindow",
-    "onLoadDataClicked",
+    "closeSignal",
     "",
+    "onLoadDataClicked",
     "onRefreshClicked",
     "onSystemSuggestionClicked",
     "onRetrainModelClicked",
     "isFirstRun",
     "onExportDataClicked",
+    "onExportImageClicked",
     "showAboutDialog",
     "onSeriesHovered",
     "point",
@@ -135,42 +143,50 @@ Q_CONSTINIT static const uint qt_meta_data_CLASSSystemWindowENDCLASS[] = {
       11,       // revision
        0,       // classname
        0,    0, // classinfo
-      13,   14, // methods
+      15,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       0,       // signalCount
+       1,       // signalCount
+
+ // signals: name, argc, parameters, tag, flags, initial metatype offsets
+       1,    0,  104,    2, 0x06,    1 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    0,   92,    2, 0x08,    1 /* Private */,
-       3,    0,   93,    2, 0x08,    2 /* Private */,
-       4,    0,   94,    2, 0x08,    3 /* Private */,
-       5,    1,   95,    2, 0x08,    4 /* Private */,
-       5,    0,   98,    2, 0x28,    6 /* Private | MethodCloned */,
-       7,    0,   99,    2, 0x08,    7 /* Private */,
-       8,    0,  100,    2, 0x08,    8 /* Private */,
-       9,    2,  101,    2, 0x08,    9 /* Private */,
-      12,    1,  106,    2, 0x08,   12 /* Private */,
-      14,    0,  109,    2, 0x08,   14 /* Private */,
-      15,    0,  110,    2, 0x08,   15 /* Private */,
-      16,    1,  111,    2, 0x08,   16 /* Private */,
-      18,    1,  114,    2, 0x08,   18 /* Private */,
+       3,    0,  105,    2, 0x08,    2 /* Private */,
+       4,    0,  106,    2, 0x08,    3 /* Private */,
+       5,    0,  107,    2, 0x08,    4 /* Private */,
+       6,    1,  108,    2, 0x08,    5 /* Private */,
+       6,    0,  111,    2, 0x28,    7 /* Private | MethodCloned */,
+       8,    0,  112,    2, 0x08,    8 /* Private */,
+       9,    0,  113,    2, 0x08,    9 /* Private */,
+      10,    0,  114,    2, 0x08,   10 /* Private */,
+      11,    2,  115,    2, 0x08,   11 /* Private */,
+      14,    1,  120,    2, 0x08,   14 /* Private */,
+      16,    0,  123,    2, 0x08,   16 /* Private */,
+      17,    0,  124,    2, 0x08,   17 /* Private */,
+      18,    1,  125,    2, 0x08,   18 /* Private */,
+      20,    1,  128,    2, 0x08,   20 /* Private */,
+
+ // signals: parameters
+    QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::Bool,    6,
+    QMetaType::Void, QMetaType::Bool,    7,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QPointF, QMetaType::Bool,   10,   11,
-    QMetaType::Void, QMetaType::Bool,   13,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::QPointF, QMetaType::Bool,   12,   13,
+    QMetaType::Void, QMetaType::Bool,   15,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, QMetaType::QDateTime,   17,
-    QMetaType::Void, QMetaType::QDateTime,   17,
+    QMetaType::Void, QMetaType::QDateTime,   19,
+    QMetaType::Void, QMetaType::QDateTime,   19,
 
        0        // eod
 };
@@ -184,6 +200,8 @@ Q_CONSTINIT const QMetaObject SystemWindow::staticMetaObject = { {
     qt_incomplete_metaTypeArray<qt_meta_stringdata_CLASSSystemWindowENDCLASS_t,
         // Q_OBJECT / Q_GADGET
         QtPrivate::TypeAndForceComplete<SystemWindow, std::true_type>,
+        // method 'closeSignal'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onLoadDataClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onRefreshClicked'
@@ -196,6 +214,8 @@ Q_CONSTINIT const QMetaObject SystemWindow::staticMetaObject = { {
         // method 'onRetrainModelClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'onExportDataClicked'
+        QtPrivate::TypeAndForceComplete<void, std::false_type>,
+        // method 'onExportImageClicked'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
         // method 'showAboutDialog'
         QtPrivate::TypeAndForceComplete<void, std::false_type>,
@@ -226,20 +246,31 @@ void SystemWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id
         auto *_t = static_cast<SystemWindow *>(_o);
         (void)_t;
         switch (_id) {
-        case 0: _t->onLoadDataClicked(); break;
-        case 1: _t->onRefreshClicked(); break;
-        case 2: _t->onSystemSuggestionClicked(); break;
-        case 3: _t->onRetrainModelClicked((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
-        case 4: _t->onRetrainModelClicked(); break;
-        case 5: _t->onExportDataClicked(); break;
-        case 6: _t->showAboutDialog(); break;
-        case 7: _t->onSeriesHovered((*reinterpret_cast< std::add_pointer_t<QPointF>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<bool>>(_a[2]))); break;
-        case 8: _t->onAutoRefreshToggled((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
-        case 9: _t->updateDataAuto(); break;
-        case 10: _t->updateDashboard(); break;
-        case 11: _t->onStartTimeChanged((*reinterpret_cast< std::add_pointer_t<QDateTime>>(_a[1]))); break;
-        case 12: _t->onEndTimeChanged((*reinterpret_cast< std::add_pointer_t<QDateTime>>(_a[1]))); break;
+        case 0: _t->closeSignal(); break;
+        case 1: _t->onLoadDataClicked(); break;
+        case 2: _t->onRefreshClicked(); break;
+        case 3: _t->onSystemSuggestionClicked(); break;
+        case 4: _t->onRetrainModelClicked((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
+        case 5: _t->onRetrainModelClicked(); break;
+        case 6: _t->onExportDataClicked(); break;
+        case 7: _t->onExportImageClicked(); break;
+        case 8: _t->showAboutDialog(); break;
+        case 9: _t->onSeriesHovered((*reinterpret_cast< std::add_pointer_t<QPointF>>(_a[1])),(*reinterpret_cast< std::add_pointer_t<bool>>(_a[2]))); break;
+        case 10: _t->onAutoRefreshToggled((*reinterpret_cast< std::add_pointer_t<bool>>(_a[1]))); break;
+        case 11: _t->updateDataAuto(); break;
+        case 12: _t->updateDashboard(); break;
+        case 13: _t->onStartTimeChanged((*reinterpret_cast< std::add_pointer_t<QDateTime>>(_a[1]))); break;
+        case 14: _t->onEndTimeChanged((*reinterpret_cast< std::add_pointer_t<QDateTime>>(_a[1]))); break;
         default: ;
+        }
+    } else if (_c == QMetaObject::IndexOfMethod) {
+        int *result = reinterpret_cast<int *>(_a[0]);
+        {
+            using _t = void (SystemWindow::*)();
+            if (_t _q_method = &SystemWindow::closeSignal; *reinterpret_cast<_t *>(_a[1]) == _q_method) {
+                *result = 0;
+                return;
+            }
         }
     }
 }
@@ -263,15 +294,21 @@ int SystemWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 13)
+        if (_id < 15)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 13;
+        _id -= 15;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 13)
+        if (_id < 15)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 13;
+        _id -= 15;
     }
     return _id;
+}
+
+// SIGNAL 0
+void SystemWindow::closeSignal()
+{
+    QMetaObject::activate(this, &staticMetaObject, 0, nullptr);
 }
 namespace {
 

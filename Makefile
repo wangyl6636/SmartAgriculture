@@ -364,7 +364,8 @@ Makefile: SmartAgriculture.pro ../QT/6.5.3/mingw_64/mkspecs/win32-g++/qmake.conf
 		../QT/6.5.3/mingw_64/lib/Qt6Concurrent.prl \
 		../QT/6.5.3/mingw_64/lib/Qt6Core.prl \
 		../QT/6.5.3/mingw_64/lib/Qt6EntryPoint.prl \
-		../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf
+		../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf \
+		icon.qrc
 	$(QMAKE) -o Makefile SmartAgriculture.pro
 ../QT/6.5.3/mingw_64/mkspecs/features/spec_pre.prf:
 ../QT/6.5.3/mingw_64/mkspecs/features/device_config.prf:
@@ -661,6 +662,7 @@ SmartAgriculture.pro:
 ../QT/6.5.3/mingw_64/lib/Qt6Core.prl:
 ../QT/6.5.3/mingw_64/lib/Qt6EntryPoint.prl:
 ../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf:
+icon.qrc:
 qmake: FORCE
 	@$(QMAKE) -o Makefile SmartAgriculture.pro
 

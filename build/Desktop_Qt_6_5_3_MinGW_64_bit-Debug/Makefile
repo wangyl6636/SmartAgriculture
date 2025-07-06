@@ -33,7 +33,7 @@ IDC           = idc
 IDL           = midl
 ZIP           = 
 DEF_FILE      = 
-RES_FILE      = 
+RES_FILE      = appicon_res.o
 SED           = sed
 MOVE          = mv -f
 SUBTARGETS    =  \
@@ -365,7 +365,8 @@ Makefile: ../../SmartAgriculture.pro ../../../QT/6.5.3/mingw_64/mkspecs/win32-g+
 		../../../QT/6.5.3/mingw_64/lib/Qt6Concurrent.prl \
 		../../../QT/6.5.3/mingw_64/lib/Qt6Core.prl \
 		../../../QT/6.5.3/mingw_64/lib/Qt6EntryPoint.prl \
-		../../../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf
+		../../../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf \
+		../../icon.qrc
 	$(QMAKE) -o Makefile ../../SmartAgriculture.pro -spec win32-g++ CONFIG+=debug CONFIG+=qml_debug
 ../../../QT/6.5.3/mingw_64/mkspecs/features/spec_pre.prf:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/device_config.prf:
@@ -663,6 +664,7 @@ Makefile: ../../SmartAgriculture.pro ../../../QT/6.5.3/mingw_64/mkspecs/win32-g+
 ../../../QT/6.5.3/mingw_64/lib/Qt6Core.prl:
 ../../../QT/6.5.3/mingw_64/lib/Qt6EntryPoint.prl:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf:
+../../icon.qrc:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ../../SmartAgriculture.pro -spec win32-g++ CONFIG+=debug CONFIG+=qml_debug
 

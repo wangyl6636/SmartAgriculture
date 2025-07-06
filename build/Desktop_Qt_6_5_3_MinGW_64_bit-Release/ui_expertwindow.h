@@ -30,6 +30,7 @@ public:
     QVBoxLayout *mainLayout;
     QHBoxLayout *navLayout;
     QLabel *titleLabel;
+    QLabel *subtitleLabel;
     QSpacerItem *horizontalSpacer;
     QPushButton *updateInfoButton;
     QPushButton *suggestButton;
@@ -57,6 +58,12 @@ public:
         titleLabel->setObjectName("titleLabel");
 
         navLayout->addWidget(titleLabel);
+
+        subtitleLabel = new QLabel(centralwidget);
+        subtitleLabel->setObjectName("subtitleLabel");
+        subtitleLabel->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
+
+        navLayout->addWidget(subtitleLabel);
 
         horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
@@ -122,6 +129,8 @@ public:
 "            color: #2c3e50;\n"
 "          ", nullptr));
         titleLabel->setText(QCoreApplication::translate("ExpertWindow", "\344\270\223\345\256\266\347\256\241\347\220\206\345\271\263\345\217\260", nullptr));
+        subtitleLabel->setStyleSheet(QCoreApplication::translate("ExpertWindow", "font-size: 13px; color: #888; margin-bottom: 2px;", nullptr));
+        subtitleLabel->setText(QCoreApplication::translate("ExpertWindow", "\345\247\223\345\220\215\357\274\214\344\275\240\345\245\275\357\274\201", nullptr));
         updateInfoButton->setStyleSheet(QCoreApplication::translate("ExpertWindow", "\n"
 "            QPushButton {\n"
 "              background-color: #3498db;\n"

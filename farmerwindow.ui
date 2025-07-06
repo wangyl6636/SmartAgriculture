@@ -50,6 +50,19 @@
        </widget>
       </item>
       <item>
+       <widget class="QLabel" name="subtitleLabel">
+        <property name="styleSheet">
+         <string>font-size: 13px; color: #888; margin-bottom: 2px;</string>
+        </property>
+        <property name="text">
+         <string>姓名，你好！</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -87,6 +100,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="viewSystemAdviceButton">
+        <property name="toolTip">
+         <string>点击查看系统为您推送的建议</string>
+        </property>
         <property name="styleSheet">
          <string>
             QPushButton {
@@ -108,10 +124,7 @@
           </string>
         </property>
         <property name="text">
-         <string>查看系统建议</string>
-        </property>
-        <property name="toolTip">
-         <string>点击查看系统为您推送的建议</string>
+         <string>查看系统报告</string>
         </property>
        </widget>
       </item>
@@ -179,7 +192,7 @@
          <x>0</x>
          <y>0</y>
          <width>788</width>
-         <height>470</height>
+         <height>478</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="suggestionsLayout">
@@ -221,9 +234,6 @@
     </item>
     <item>
      <widget class="QPushButton" name="refreshButton">
-      <property name="text">
-       <string>刷新</string>
-      </property>
       <property name="styleSheet">
        <string>
         QPushButton {
@@ -242,6 +252,9 @@
           background-color: #21618c;  /* 按下时背景颜色 */
         }
        </string>
+      </property>
+      <property name="text">
+       <string>刷新</string>
       </property>
      </widget>
     </item>

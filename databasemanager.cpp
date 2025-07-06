@@ -10,19 +10,30 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QElapsedTimer>
+#include <QCryptographicHash>
 
+/**
+ * @brief 构造函数，初始化数据库管理器
+ */
 DataBaseManager::DataBaseManager() {}
 
+/**
+ * @brief 析构函数，关闭数据库连接
+ */
 DataBaseManager::~DataBaseManager() {
     if (db.isOpen()) db.close();
 }
 
+/**
+ * @brief 初始化数据库连接，配置ODBC参数
+ * @return 是否连接成功
+ */
 bool DataBaseManager::InitDataBase() {
     if (QSqlDatabase::contains("smartagri_connection")) {
         db = QSqlDatabase::database("smartagri_connection");
     } else {
         db = QSqlDatabase::addDatabase("QODBC", "smartagri_connection");
-        QString dsn = QString("DRIVER=MySQL ODBC 9.3 Unicode Driver;SERVER=rm-2ze58122pu228651soo.mysql.rds.aliyuncs.com;DATABASE=SAdb;USER=dashuai;PASSWORD=DaShuai123456;OPTION=3;");
+        QString dsn = QString("DRIVER=MySQL ODBC 9.3 Unicode Driver;SERVER=;DATABASE=SAdb;USER=;PASSWORD=;OPTION=3;");
         db.setDatabaseName(dsn);
     }
     if (db.open()) {
@@ -34,12 +45,19 @@ bool DataBaseManager::InitDataBase() {
     }
 }
 
+/**
+ * @brief 检查数据库是否打开
+ * @return 是否已打开
+ */
 bool DataBaseManager::IsOpen() const {
     qDebug("检查数据库连接");
     return db.isOpen();
 }
 
-// 用户相关
+// ================= 用户相关 =================
+/**
+ * @brief 添加用户，返回用户id
+ */
 int DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role, QString* errorOut) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO users (name, phone, passwd, role) VALUES (:name, :phone, :passwd, :role)");
@@ -55,11 +73,17 @@ int DataBaseManager::AddUser(const QString& name, const QString& phone, const QS
         return query.lastInsertId().toInt();
     }
 }
-// 兼容原有接口
+
+/**
+ * @brief 添加用户（兼容原有接口）
+ */
 int DataBaseManager::AddUser(const QString& name, const QString& phone, const QString& password, const QString& role) {
     return AddUser(name,phone,password,role,nullptr);
 }
 
+/**
+ * @brief 更新用户信息
+ */
 bool DataBaseManager::UpdateUser(int userId, const QString& name, const QString& phone, const QString& password, const QString& role) {
     QSqlQuery query(db);
     query.prepare("UPDATE users SET name=:name, phone=:phone, passwd=:passwd, role=:role WHERE id=:id");
@@ -71,6 +95,9 @@ bool DataBaseManager::UpdateUser(int userId, const QString& name, const QString&
     return query.exec();
 }
 
+/**
+ * @brief 删除用户
+ */
 bool DataBaseManager::DeleteUser(int userId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM users WHERE id=:id");
@@ -78,12 +105,16 @@ bool DataBaseManager::DeleteUser(int userId) {
     return query.exec();
 }
 
+/**
+ * @brief 检查用户登录，返回角色
+ */
 bool DataBaseManager::CheckUserLogin(const QString& name, const QString& phone, const QString& password, QString& role) {
     QSqlQuery query(db);
+    QString hashedPassword = DataBaseManager::hashPassword(password);
     query.prepare("SELECT role FROM users WHERE name=:name AND phone=:phone AND passwd=:passwd");
     query.bindValue(":name", name);
     query.bindValue(":phone", phone);
-    query.bindValue(":passwd", password);
+    query.bindValue(":passwd", hashedPassword);
     if (query.exec() && query.next()) {
         role = query.value(0).toString();
         return true;
@@ -91,6 +122,9 @@ bool DataBaseManager::CheckUserLogin(const QString& name, const QString& phone, 
     return false;
 }
 
+/**
+ * @brief 检查手机号是否已注册
+ */
 bool DataBaseManager::IsUserExists(const QString& phone){
     QSqlQuery query(db);
     query.prepare("SELECT COUNT(*) FROM users WHERE phone=:phone");
@@ -101,6 +135,9 @@ bool DataBaseManager::IsUserExists(const QString& phone){
     return false;
 }
 
+/**
+ * @brief 获取指定用户信息
+ */
 QVariantList DataBaseManager::GetUserInfo(int userId) {
     QVariantList result;
     QSqlQuery query(db);
@@ -113,6 +150,9 @@ QVariantList DataBaseManager::GetUserInfo(int userId) {
     return result;
 }
 
+/**
+ * @brief 获取所有用户信息
+ */
 QVariantList DataBaseManager::GetAllUsers() {
     QVariantList result;
     QSqlQuery query(db);
@@ -128,6 +168,9 @@ QVariantList DataBaseManager::GetAllUsers() {
     return result;
 }
 
+/**
+ * @brief 通过手机号获取用户id
+ */
 int DataBaseManager::GetUserIdByPhone(const QString& phone) {
     QSqlQuery query(db);
     query.prepare("SELECT id FROM users WHERE phone=:phone");
@@ -139,6 +182,9 @@ int DataBaseManager::GetUserIdByPhone(const QString& phone) {
     return -1;  // 如果没有找到该电话号码的用户，返回 -1
 }
 
+/**
+ * @brief 通过农户id获取用户id
+ */
 int DataBaseManager::GetUserIdByFarmerId(int FarmerId){
     QSqlQuery query(db);
     query.prepare("SELECT user_id FROM farmer WHERE id = :farmerid");
@@ -149,6 +195,9 @@ int DataBaseManager::GetUserIdByFarmerId(int FarmerId){
     return -1;
 }
 
+/**
+ * @brief 通过专家id获取用户id
+ */
 int DataBaseManager::GetUserIdByExpertId(int ExpertId){
     QSqlQuery query(db);
     query.prepare("SELECT user_id FROM expert WHERE id = :expertId");
@@ -160,8 +209,10 @@ int DataBaseManager::GetUserIdByExpertId(int ExpertId){
     return -1;  // 如果没有找到该专家ID对应的用户，返回 -1
 }
 
-
-// 作物区相关
+// ================= 作物区相关 =================
+/**
+ * @brief 添加作物区
+ */
 bool DataBaseManager::AddCropArea(int farmerId, const QString& cropType, float area, const QString& location, const QString& detail) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO crop_area (farmer_id, crop_type, area, location, detail) VALUES (?, ?, ?, ?, ?)");
@@ -173,6 +224,9 @@ bool DataBaseManager::AddCropArea(int farmerId, const QString& cropType, float a
     return query.exec();
 }
 
+/**
+ * @brief 更新作物区信息
+ */
 bool DataBaseManager::UpdateCropArea(int cropAreaId, const QString& cropType, float area, const QString& location, const QString& detail) {
     QSqlQuery query(db);
     query.prepare("UPDATE crop_area SET crop_type=?, area=?, location=?, detail=? WHERE id=?");
@@ -184,6 +238,9 @@ bool DataBaseManager::UpdateCropArea(int cropAreaId, const QString& cropType, fl
     return query.exec();
 }
 
+/**
+ * @brief 删除作物区
+ */
 bool DataBaseManager::DeleteCropArea(int cropAreaId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM crop_area WHERE id=?");
@@ -198,6 +255,9 @@ bool DataBaseManager::DeleteCropArea(int cropAreaId) {
     return true;
 }
 
+/**
+ * @brief 获取指定农户的作物区
+ */
 QVariantList DataBaseManager::GetCropAreas(int farmerId) {
     QVariantList result;
     QSqlQuery query(db);
@@ -226,6 +286,9 @@ QVariantList DataBaseManager::GetCropAreas(int farmerId) {
     return result;
 }
 
+/**
+ * @brief 获取所有作物区
+ */
 QVariantList DataBaseManager::GetAllCropAreas() {
     QVariantList result;
     QSqlQuery query(db);
@@ -241,11 +304,10 @@ QVariantList DataBaseManager::GetAllCropAreas() {
     return result;
 }
 
-// 系统建议相关
-// 已删除所有system_advice相关实现
-
-// 专家建议相关
-// 添加专家建议
+// ================= 专家建议相关 =================
+/**
+ * @brief 添加专家建议
+ */
 bool DataBaseManager::AddExpertAdvice(int expertId, int cropAreaId, const QString& title, const QString& content, const QString& category) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO expert_advice (expert_id, crop_area_id, title, content, category) VALUES (?, ?, ?, ?, ?)");
@@ -257,7 +319,9 @@ bool DataBaseManager::AddExpertAdvice(int expertId, int cropAreaId, const QStrin
     return query.exec();
 }
 
-// 更新专家建议
+/**
+ * @brief 更新专家建议
+ */
 bool DataBaseManager::UpdateExpertAdvice(int adviceId, const QString& title, const QString& content, const QString& category) {
     QSqlQuery query(db);
     query.prepare("UPDATE expert_advice SET title=?, content=?, category=? WHERE id=?");
@@ -268,7 +332,9 @@ bool DataBaseManager::UpdateExpertAdvice(int adviceId, const QString& title, con
     return query.exec();
 }
 
-// 删除专家建议
+/**
+ * @brief 删除专家建议
+ */
 bool DataBaseManager::DeleteExpertAdvice(int adviceId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM expert_advice WHERE id=?");
@@ -276,7 +342,9 @@ bool DataBaseManager::DeleteExpertAdvice(int adviceId) {
     return query.exec();
 }
 
-// 获取特定种植区域的专家建议
+/**
+ * @brief 获取指定作物区的专家建议
+ */
 QVariantList DataBaseManager::GetExpertAdvices(int cropAreaId) {
     QVariantList result;
     QSqlQuery query(db);
@@ -307,7 +375,9 @@ QVariantList DataBaseManager::GetExpertAdvices(int cropAreaId) {
     return result;
 }
 
-// 获取当前农户的所有专家建议
+/**
+ * @brief 获取当前农户的所有专家建议
+ */
 QVariantList DataBaseManager::GetFarmerExpertAdvices(int farmerId) {
     QVariantList result;
     QSqlQuery query(db);
@@ -343,6 +413,9 @@ QVariantList DataBaseManager::GetFarmerExpertAdvices(int farmerId) {
     return result;
 }
 
+/**
+ * @brief 获取所有专家建议
+ */
 QVariantList DataBaseManager::GetAllExpertAdvices() {
     QVariantList result;
     QSqlQuery query(db);
@@ -358,7 +431,10 @@ QVariantList DataBaseManager::GetAllExpertAdvices() {
     return result;
 }
 
-// 模型优化建议相关
+// ================= 模型优化建议相关 =================
+/**
+ * @brief 添加模型优化建议
+ */
 bool DataBaseManager::AddModelOptimization(int userId, int role, const QString& content) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO model_optimization (user_id, role, content) VALUES (?, ?, ?)");
@@ -368,6 +444,9 @@ bool DataBaseManager::AddModelOptimization(int userId, int role, const QString& 
     return query.exec();
 }
 
+/**
+ * @brief 更新模型优化建议
+ */
 bool DataBaseManager::UpdateModelOptimization(int optimizationId, const QString& content) {
     QSqlQuery query(db);
     query.prepare("UPDATE model_optimization SET content=? WHERE id=?");
@@ -376,6 +455,9 @@ bool DataBaseManager::UpdateModelOptimization(int optimizationId, const QString&
     return query.exec();
 }
 
+/**
+ * @brief 删除模型优化建议
+ */
 bool DataBaseManager::DeleteModelOptimization(int optimizationId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM model_optimization WHERE id=?");
@@ -383,6 +465,9 @@ bool DataBaseManager::DeleteModelOptimization(int optimizationId) {
     return query.exec();
 }
 
+/**
+ * @brief 获取所有模型优化建议
+ */
 QVariantList DataBaseManager::GetModelOptimizations() {
     QVariantList result;
     QSqlQuery query(db);
@@ -398,6 +483,9 @@ QVariantList DataBaseManager::GetModelOptimizations() {
     return result;
 }
 
+/**
+ * @brief 获取所有模型优化建议（冗余接口）
+ */
 QVariantList DataBaseManager::GetAllModelOptimizations() {
     QVariantList result;
     QSqlQuery query(db);
@@ -413,28 +501,37 @@ QVariantList DataBaseManager::GetAllModelOptimizations() {
     return result;
 }
 
-// 单例实现
+// ================= 单例实现 =================
+/**
+ * @brief 获取数据库管理器单例对象
+ */
 DataBaseManager& DataBaseManager::instance() {
     static DataBaseManager instance;
     return instance;
 }
 
-//测试函数
-// void DataBaseManager::TestPrintAllSensors() {
-//     QSqlQuery query(db);
-//     if (!query.exec("SELECT * FROM sensor")) {
-//         qDebug() << "查询传感器数据失败:" << query.lastError().text();
-//         return;
-//     }
-//     while (query.next()) {
-//         QStringList row;
-//         for (int i = 0; i < query.record().count(); ++i) {
-//             row << query.record().fieldName(i) + "=" + query.value(i).toString();
-//         }
-//         qDebug() << row.join(", ");
-//     }
-// }
+/**
+ * @brief 测试：打印所有传感器信息
+ */
+void DataBaseManager::TestPrintAllSensors() {
+    QSqlQuery query(db);
+    if (!query.exec("SELECT * FROM sensor")) {
+        qDebug() << "查询传感器数据失败:" << query.lastError().text();
+        return;
+    }
+    while (query.next()) {
+        QStringList row;
+        for (int i = 0; i < query.record().count(); ++i) {
+            row << query.record().fieldName(i) + "=" + query.value(i).toString();
+        }
+        qDebug() << row.join(", ");
+    }
+}
 
+// ================= 传感器相关 =================
+/**
+ * @brief 获取指定传感器信息
+ */
 QVariantList DataBaseManager::GetSensorInfo(int sensorId) {
     QVariantList result;
     QSqlQuery query(db);
@@ -449,6 +546,9 @@ QVariantList DataBaseManager::GetSensorInfo(int sensorId) {
     return result;
 }
 
+/**
+ * @brief 获取所有传感器信息
+ */
 QVariantList DataBaseManager::GetAllSensors() {
     QVariantList result;
     QSqlQuery query(db);
@@ -464,8 +564,10 @@ QVariantList DataBaseManager::GetAllSensors() {
     return result;
 }
 
-
-//农户相关
+// ================= 农户相关 =================
+/**
+ * @brief 添加农户用户
+ */
 int DataBaseManager::AddFarmerUser(const int userId) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO farmer (user_id) VALUES (:userId)");
@@ -478,6 +580,9 @@ int DataBaseManager::AddFarmerUser(const int userId) {
     }
 }
 
+/**
+ * @brief 删除农户用户
+ */
 bool DataBaseManager::DeleteFarmerUser(const int farmerId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM farmer WHERE id=:farmerId");
@@ -487,6 +592,9 @@ bool DataBaseManager::DeleteFarmerUser(const int farmerId) {
     return success;  // 返回是否删除成功
 }
 
+/**
+ * @brief 通过用户id获取农户id
+ */
 int DataBaseManager::GetFarmerId(const int userId) {
     QSqlQuery query(db);
     query.prepare("SELECT id FROM farmer WHERE user_id=:userId");
@@ -499,7 +607,10 @@ int DataBaseManager::GetFarmerId(const int userId) {
     return -1;  // 如果没有找到农户信息，返回 -1
 }
 
-//专家相关
+// ================= 专家相关 =================
+/**
+ * @brief 添加专家用户
+ */
 bool DataBaseManager::AddExpertUser(const int userId, const QString& field) {
     QSqlQuery query(db);
     query.prepare("INSERT INTO expert (user_id, field) VALUES (:userId, :field)");
@@ -509,6 +620,9 @@ bool DataBaseManager::AddExpertUser(const int userId, const QString& field) {
     return query.exec();
 }
 
+/**
+ * @brief 删除专家用户
+ */
 bool DataBaseManager::DeleteExpertUser(const int expertId) {
     QSqlQuery query(db);
     query.prepare("DELETE FROM expert WHERE id=:expertId");
@@ -518,6 +632,9 @@ bool DataBaseManager::DeleteExpertUser(const int expertId) {
     return success;  // 返回是否删除成功
 }
 
+/**
+ * @brief 通过用户id获取专家id
+ */
 int DataBaseManager::GetExpertId(const int userId) {
     QSqlQuery query(db);
     query.prepare("SELECT id FROM expert WHERE user_id=:userId");
@@ -529,6 +646,9 @@ int DataBaseManager::GetExpertId(const int userId) {
     return -1;  // 如果没有找到专家信息，返回 -1
 }
 
+/**
+ * @brief 获取专家领域
+ */
 QString DataBaseManager::GetExpertField(const int expertId){
     QSqlQuery query(db);
     query.prepare("SELECT field FROM expert WHERE id=:expertId");
@@ -539,6 +659,9 @@ QString DataBaseManager::GetExpertField(const int expertId){
     return QString();  // 如果没有找到专家信息，返回空字符串
 }
 
+/**
+ * @brief 获取上一条数据库错误信息
+ */
 QString DataBaseManager::GetLastError() const {
     QSqlQuery query(db);
     if (query.lastError().isValid()) { 
@@ -547,18 +670,30 @@ QString DataBaseManager::GetLastError() const {
     return QString();  // 如果没有错误，返回空字符串
 }
 
+/**
+ * @brief 开启数据库事务
+ */
 bool DataBaseManager::BeginTransaction() {
     return db.transaction();
 }
 
+/**
+ * @brief 提交数据库事务
+ */
 bool DataBaseManager::CommitTransaction() {
     return db.commit();
 }
 
+/**
+ * @brief 回滚数据库事务
+ */
 bool DataBaseManager::RollbackTransaction() {
     return db.rollback();
 }
 
+/**
+ * @brief 测试数据库连接是否可用
+ */
 bool DataBaseManager::TestConnection() {
     QSqlQuery testQuery(db);
     testQuery.prepare("SELECT 1"); // 执行简单查询测试连接
@@ -578,6 +713,9 @@ bool DataBaseManager::TestConnection() {
     return testQuery.next() && testQuery.value(0).toInt() == 1;
 }
 
+/**
+ * @brief 更新专家领域
+ */
 bool DataBaseManager::UpdateExpert(int expertId, const QString& field) {
     QSqlQuery query(db);
     query.prepare("UPDATE expert SET field = :field WHERE id = :id");
@@ -586,6 +724,9 @@ bool DataBaseManager::UpdateExpert(int expertId, const QString& field) {
     return query.exec();
 }
 
+/**
+ * @brief 获取某专家对某作物区的所有建议
+ */
 QVariantList DataBaseManager::GetExpertAdviceList(int expertId, int cropAreaId)
 {
     QVariantList adviceList;
@@ -610,7 +751,10 @@ QVariantList DataBaseManager::GetExpertAdviceList(int expertId, int cropAreaId)
     return adviceList;
 }
 
-// 传感器相关扩展函数实现
+// ================= 传感器相关扩展 =================
+/**
+ * @brief 获取指定作物区、时间段内所有SA_TH数据
+ */
 QVariantList DataBaseManager::GetSAThData(int cropAreaId, const QString& startTime, const QString& endTime) {
     QVariantList result;
     QSqlQuery query(db);
@@ -637,6 +781,9 @@ QVariantList DataBaseManager::GetSAThData(int cropAreaId, const QString& startTi
     return result;
 }
 
+/**
+ * @brief 获取指定作物区、时间段内所有SA_soil数据
+ */
 QVariantList DataBaseManager::GetSASoilData(int cropAreaId, const QString& startTime, const QString& endTime) {
     QVariantList result;
     QSqlQuery query(db);
@@ -662,6 +809,9 @@ QVariantList DataBaseManager::GetSASoilData(int cropAreaId, const QString& start
     return result;
 }
 
+/**
+ * @brief 获取指定作物区最新一条SA_soil和SA_th数据
+ */
 QVariantMap DataBaseManager::GetLatestSoilAndThData(int cropAreaId) {
     QVariantMap result;
     // soil
@@ -696,7 +846,9 @@ QVariantMap DataBaseManager::GetLatestSoilAndThData(int cropAreaId) {
     return result;
 }
 
-// 测试函数：测试新加的sensor相关接口
+/**
+ * @brief 测试：打印指定作物区、时间段内的传感器数据
+ */
 void DataBaseManager::TestPrintSensorFunctions(int cropAreaId, const QString& startTime, const QString& endTime) {
     qDebug() << "--- 测试GetSAThData ---";
     QVariantList saThList = GetSAThData(cropAreaId, startTime, endTime);
@@ -726,4 +878,9 @@ void DataBaseManager::TestPrintSensorFunctions(int cropAreaId, const QString& st
              << "stemp:" << latest.value("stemp").toDouble()
              << "hum:" << latest.value("hum").toDouble()
              << "shum:" << latest.value("shum").toDouble();
+}
+
+QString DataBaseManager::hashPassword(const QString &password) {
+    QByteArray hash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
+    return hash.toHex();
 }

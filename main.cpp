@@ -2,10 +2,14 @@
 #include "databasemanager.h"
 #include <QApplication>
 #include <QMessageBox>
+#include <QIcon>
+#include <QFile>
+#include <QDebug>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setWindowIcon(QIcon(":/SA_icon.ico"));
     MainWindow w;
     w.show();
 
@@ -21,9 +25,6 @@ int main(int argc, char *argv[])
     } else {
         qDebug() << "Database connected successfully.";
     }
-
-    // 测试函数调用
-    DataBaseManager::instance().TestPrintSensorFunctions(2, "2025-06-01 00:00", "2025-07-02 23:00");
 
     return a.exec();
 }

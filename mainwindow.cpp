@@ -1,3 +1,5 @@
+// mainwindow.cpp
+// 主窗口类实现文件，实现登录、注册、窗口切换、主界面拖动等功能
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "databasemanager.h"
@@ -6,9 +8,17 @@
 #include <QRegularExpression>
 #include <QPalette>
 #include <QMessageBox>
+#include <QProgressDialog>
+#include <QtConcurrent>
+#include <QFuture>
+#include <QFutureWatcher>
 
 static bool islegal=false;
 
+/**
+ * @brief 构造函数，初始化UI、信号槽、窗口属性等
+ * @param parent 父窗口指针
+ */
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -36,17 +46,30 @@ MainWindow::MainWindow(QWidget *parent)
         }
     });
 
-    //多方转入注册界面
+    // 切换到注册界面
     connect(ui->pushButtonSwitchMode, &QPushButton::clicked, this, &MainWindow::on_pushButtonRegister_clicked);
+
+    // 窗口自适应内容并禁止缩放
+    this->adjustSize();
+    this->setFixedSize(this->size());
+    // 设置无边框极简风格
+    this->setWindowFlags(Qt::FramelessWindowHint | Qt::Window);
+
+    // 关闭按钮
+    connect(ui->pushButtonClose, &QPushButton::clicked, this, &MainWindow::close);
 }
 
+/**
+ * @brief 析构函数，释放UI资源
+ */
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-//注册按钮点击事件
-// 当用户点击注册按钮时，隐藏主窗口并显示注册窗口
+/**
+ * @brief 注册按钮点击槽，切换到注册窗口
+ */
 void MainWindow::on_pushButtonRegister_clicked()
 {
     qDebug() << "Switching to Register Window";
@@ -59,10 +82,9 @@ void MainWindow::on_pushButtonRegister_clicked()
     rWindow->show();
 }
 
-//保证注册界面的临时窗口被关闭后，主窗口重新显示
-// 这里使用了信号槽机制，当RegisterWindow关闭时，触发MainWindow的ReShow槽函数
-// 这样可以确保主窗口在注册窗口关闭后重新显示，而不是直接删除主窗口实例
-// 这种方式可以避免直接删除主窗口实例，保持应用程序的稳定性和一致性
+/**
+ * @brief 注册窗口关闭后重新显示主窗口
+ */
 void MainWindow::ReShow(){
     this->show();
     disconnect(rWindow, &RegisterWindow::closedSignal, this, &MainWindow::ReShow);
@@ -70,26 +92,23 @@ void MainWindow::ReShow(){
     rWindow=nullptr;
 }
 
-//登录
+/**
+ * @brief 登录按钮点击槽，处理登录逻辑
+ */
 void MainWindow::on_pushButtonLogin_clicked()
 {
     if(!islegal) {
         QMessageBox::critical(this, "错误", "手机号格式不正确，请重新输入！");
         return;
     }
-
-    // 获取用户输入信息
     QString name = ui->lineEditName->text();
     if (name.isEmpty()) {  
         QMessageBox::warning(this, "警告", "用户名不能为空，请输入用户名！");
         return;
     }
-
     QString phone = ui->lineEditPhone->text();
     QString password = ui->lineEditPassword->text();
     QString role = ui->comboBoxRole->currentText();
-
-    //转换角色为英文，以便数据库
     if(role == "管理员") {
         role = "admin";
     } else if(role == "农户") {
@@ -97,57 +116,114 @@ void MainWindow::on_pushButtonLogin_clicked()
     }else if(role == "专家") {
         role = "expert";
     } 
-
-    // 检查用户登录
-    DataBaseManager &db = DataBaseManager::instance();
-    QString userRole;
-
-    //判断数据库是否连接
-    if (!db.TestConnection()) {
-        QMessageBox::warning(this, "警告", "数据库连接不稳定，请检查网络后重试！");
-        return;
-    }
-
-    if (db.CheckUserLogin(name, phone, password, userRole)) {
-        if (userRole == role) {
-            // 登录成功，跳转到对应的界面
+    // 显示进度条
+    QProgressDialog *progress = new QProgressDialog("正在登录，请稍候...", QString(), 0, 0, this);
+    progress->setWindowModality(Qt::WindowModal);
+    progress->setCancelButton(nullptr);
+    progress->setMinimumDuration(0);
+    progress->setStyleSheet(
+        "QProgressDialog { background: white; border: 2px solid #3498db; border-radius: 10px; }"
+        "QLabel { color: #3498db; font-size: 16px; }"
+        "QProgressBar { height: 16px; border-radius: 8px; background: #e0e0e0; }"
+        "QProgressBar::chunk { background: #3498db; }"
+    );
+    progress->show();
+    qApp->processEvents();
+    // 用QFutureWatcher监控线程
+    QFutureWatcher<QPair<bool, QString>> *watcher = new QFutureWatcher<QPair<bool, QString>>(this);
+    // 登录逻辑放到子线程
+    QFuture<QPair<bool, QString>> future = QtConcurrent::run([=]() -> QPair<bool, QString> {
+        DataBaseManager &db = DataBaseManager::instance();
+        if (!db.TestConnection()) {
+            return qMakePair(false, QString("数据库连接不稳定，请检查网络后重试！"));
+        }
+        QString userRole;
+        if (db.CheckUserLogin(name, phone, password, userRole)) {
+            if (userRole == role) {
+                return qMakePair(true, userRole);
+            } else {
+                return qMakePair(false, QString("登录失败，请检查手机号、密码和角色是否匹配！"));
+            }
+        } else {
+            return qMakePair(false, QString("登录失败，请检查手机号和密码是否正确！"));
+        }
+    });
+    watcher->setFuture(future);
+    connect(watcher, &QFutureWatcher<QPair<bool, QString>>::finished, this, [=]() {
+        QPair<bool, QString> result = watcher->result();
+        if (result.first) {
+            // 登录成功，主线程跳转
             if (role == "admin") {
-                // 跳转到管理员界面
                 aWindow = new AdminWindow();
                 aWindow->show();
             } else if (role == "farmer") {
-                // 跳转到农户界面
+                DataBaseManager &db = DataBaseManager::instance();
                 int userId = db.GetUserIdByPhone(phone);
                 int farmerId = db.GetFarmerId(userId);
-
-                qDebug()<<"当前农户用户id："<<userId;
-                qDebug()<<"当前农户id："<<farmerId;
-
                 fWindow = new FarmerWindow(farmerId);
+                fWindow->setUserName(name);
+                connect(fWindow,&FarmerWindow::logout,this,&MainWindow::show);
                 fWindow->show();
             } else if (role == "expert") {
-                // 跳转到专家界面
+                DataBaseManager &db = DataBaseManager::instance();
                 int userId = db.GetUserIdByPhone(phone);
                 int expertId = db.GetExpertId(userId);
-
-                qDebug()<<"当前专家用户id："<<userId;   
-                qDebug()<<"当前专家id："<<expertId;
-
                 eWindow = new ExpertWindow(expertId);
+                eWindow->setUserName(name);
+                connect(eWindow, &ExpertWindow::logout, this, &MainWindow::show);
                 eWindow->show();
             }
-            this->hide(); // 隐藏登录窗口
+            progress->close();
+            progress->deleteLater();
+            this->hide();
         } else {
-            QMessageBox::warning(this, "警告", "登录失败，请检查手机号、密码和角色是否匹配！");
+            progress->close();
+            progress->deleteLater();
+            QMessageBox::warning(this, "登录失败", result.second);
         }
-    } else {
-        QMessageBox::critical(this, "错误", "登录失败，请检查手机号和密码是否正确！");
-    }
+        watcher->deleteLater();
+    });
 }
 
+/**
+ * @brief 登出槽函数，关闭子窗口并显示主窗口
+ */
 void MainWindow::onLogout() {
     if (fWindow) { fWindow->close(); delete fWindow; fWindow = nullptr; }
     if (eWindow) { eWindow->close(); delete eWindow; eWindow = nullptr; }
     if (aWindow) { aWindow->close(); delete aWindow; aWindow = nullptr; }
     this->show();
+}
+
+/**
+ * @brief 鼠标按下事件，处理窗口拖动
+ */
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    // 只允许左键拖动，且在loginFrame区域内
+    if (event->button() == Qt::LeftButton && ui->loginFrame->geometry().contains(event->pos())) {
+        m_dragging = true;
+        m_dragPosition = event->globalPosition().toPoint() - this->frameGeometry().topLeft();
+        event->accept();
+    }
+}
+
+/**
+ * @brief 鼠标移动事件，处理窗口拖动
+ */
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    if (m_dragging && (event->buttons() & Qt::LeftButton)) {
+        this->move(event->globalPosition().toPoint() - m_dragPosition);
+        event->accept();
+    }
+}
+
+/**
+ * @brief 鼠标释放事件，处理窗口拖动
+ */
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    m_dragging = false;
+    QMainWindow::mouseReleaseEvent(event);
 }

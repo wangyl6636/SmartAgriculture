@@ -1,3 +1,5 @@
+// expertadviceform.cpp
+// 专家建议表单窗口实现文件，实现专家对作物区建议的增删与展示
 #include "expertadviceform.h"
 #include "ui_expertadviceform.h"
 #include "databasemanager.h"
@@ -13,6 +15,12 @@
 #include <QComboBox>
 #include <QMessageBox>
 
+/**
+ * @brief 构造函数，初始化UI并加载建议列表
+ * @param expertId 专家id
+ * @param cropAreaId 作物区id
+ * @param parent 父窗口
+ */
 ExpertAdviceForm::ExpertAdviceForm(int expertId, int cropAreaId, QWidget *parent)
     : QWidget(parent), expertId(expertId), cropAreaId(cropAreaId), ui(new Ui::ExpertAdviceForm)
 {
@@ -20,17 +28,27 @@ ExpertAdviceForm::ExpertAdviceForm(int expertId, int cropAreaId, QWidget *parent
     loadAdviceList();
 }
 
+/**
+ * @brief 析构函数，释放UI资源
+ */
 ExpertAdviceForm::~ExpertAdviceForm()
 {
     delete ui;
 }
 
+/**
+ * @brief 重写关闭事件，发送关闭信号
+ * @param event 关闭事件指针
+ */
 void ExpertAdviceForm::closeEvent(QCloseEvent *event)
 {
     emit closeSignal();
     event->accept();
 }
 
+/**
+ * @brief 加载专家建议列表，动态生成卡片
+ */
 void ExpertAdviceForm::loadAdviceList()
 {
     clearAdviceList();
@@ -46,9 +64,11 @@ void ExpertAdviceForm::loadAdviceList()
         QVariantList advice = item.toList();
         addAdviceCard(advice);
     }
-    
 }
 
+/**
+ * @brief 清空所有建议卡片
+ */
 void ExpertAdviceForm::clearAdviceList()
 {
     QLayout *layout = ui->adviceLayout;
@@ -60,6 +80,10 @@ void ExpertAdviceForm::clearAdviceList()
     }
 }
 
+/**
+ * @brief 添加建议卡片到界面，支持撤回操作
+ * @param advice 建议信息（QVariantList）
+ */
 void ExpertAdviceForm::addAdviceCard(const QVariantList &advice)
 {
     QWidget *card = new QWidget();
@@ -88,7 +112,6 @@ void ExpertAdviceForm::addAdviceCard(const QVariantList &advice)
     hbox->addWidget(contentLabel);
     hbox->addWidget(timeLabel);
     hbox->addWidget(categoryLabel);
-
     hbox->addStretch();
 
     QPushButton *retractBtn = new QPushButton("撤回");
@@ -112,6 +135,9 @@ void ExpertAdviceForm::addAdviceCard(const QVariantList &advice)
     ui->adviceLayout->addWidget(card);
 }
 
+/**
+ * @brief 添加建议按钮点击槽，弹窗输入并添加新建议
+ */
 void ExpertAdviceForm::on_addAdviceButton_clicked() {
     // 创建对话框
     QDialog dialog(this);
