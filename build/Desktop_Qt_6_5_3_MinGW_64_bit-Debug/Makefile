@@ -33,7 +33,7 @@ IDC           = idc
 IDL           = midl
 ZIP           = 
 DEF_FILE      = 
-RES_FILE      = 
+RES_FILE      = appicon_res.o
 SED           = sed
 MOVE          = mv -f
 SUBTARGETS    =  \
@@ -330,7 +330,7 @@ Makefile: ../../SmartAgriculture.pro ../../../QT/6.5.3/mingw_64/mkspecs/win32-g+
 		../../../QT/6.5.3/mingw_64/mkspecs/features/qt_config.prf \
 		../../../QT/6.5.3/mingw_64/mkspecs/win32-g++/qmake.conf \
 		../../../QT/6.5.3/mingw_64/mkspecs/features/spec_post.prf \
-		.qmake.stash \
+		../../.qmake.stash \
 		../../../QT/6.5.3/mingw_64/mkspecs/features/exclusive_builds.prf \
 		../../../QT/6.5.3/mingw_64/mkspecs/features/toolchain.prf \
 		../../../QT/6.5.3/mingw_64/mkspecs/features/default_pre.prf \
@@ -356,12 +356,17 @@ Makefile: ../../SmartAgriculture.pro ../../../QT/6.5.3/mingw_64/mkspecs/win32-g+
 		../../../QT/6.5.3/mingw_64/mkspecs/features/yacc.prf \
 		../../../QT/6.5.3/mingw_64/mkspecs/features/lex.prf \
 		../../SmartAgriculture.pro \
+		../../../QT/6.5.3/mingw_64/lib/Qt6Charts.prl \
+		../../../QT/6.5.3/mingw_64/lib/Qt6OpenGLWidgets.prl \
 		../../../QT/6.5.3/mingw_64/lib/Qt6Widgets.prl \
+		../../../QT/6.5.3/mingw_64/lib/Qt6OpenGL.prl \
 		../../../QT/6.5.3/mingw_64/lib/Qt6Gui.prl \
 		../../../QT/6.5.3/mingw_64/lib/Qt6Sql.prl \
+		../../../QT/6.5.3/mingw_64/lib/Qt6Concurrent.prl \
 		../../../QT/6.5.3/mingw_64/lib/Qt6Core.prl \
 		../../../QT/6.5.3/mingw_64/lib/Qt6EntryPoint.prl \
-		../../../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf
+		../../../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf \
+		../../icon.qrc
 	$(QMAKE) -o Makefile ../../SmartAgriculture.pro -spec win32-g++ CONFIG+=debug CONFIG+=qml_debug
 ../../../QT/6.5.3/mingw_64/mkspecs/features/spec_pre.prf:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/device_config.prf:
@@ -623,7 +628,7 @@ Makefile: ../../SmartAgriculture.pro ../../../QT/6.5.3/mingw_64/mkspecs/win32-g+
 ../../../QT/6.5.3/mingw_64/mkspecs/features/qt_config.prf:
 ../../../QT/6.5.3/mingw_64/mkspecs/win32-g++/qmake.conf:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/spec_post.prf:
-.qmake.stash:
+../../.qmake.stash:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/exclusive_builds.prf:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/toolchain.prf:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/default_pre.prf:
@@ -649,12 +654,17 @@ Makefile: ../../SmartAgriculture.pro ../../../QT/6.5.3/mingw_64/mkspecs/win32-g+
 ../../../QT/6.5.3/mingw_64/mkspecs/features/yacc.prf:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/lex.prf:
 ../../SmartAgriculture.pro:
+../../../QT/6.5.3/mingw_64/lib/Qt6Charts.prl:
+../../../QT/6.5.3/mingw_64/lib/Qt6OpenGLWidgets.prl:
 ../../../QT/6.5.3/mingw_64/lib/Qt6Widgets.prl:
+../../../QT/6.5.3/mingw_64/lib/Qt6OpenGL.prl:
 ../../../QT/6.5.3/mingw_64/lib/Qt6Gui.prl:
 ../../../QT/6.5.3/mingw_64/lib/Qt6Sql.prl:
+../../../QT/6.5.3/mingw_64/lib/Qt6Concurrent.prl:
 ../../../QT/6.5.3/mingw_64/lib/Qt6Core.prl:
 ../../../QT/6.5.3/mingw_64/lib/Qt6EntryPoint.prl:
 ../../../QT/6.5.3/mingw_64/mkspecs/features/build_pass.prf:
+../../icon.qrc:
 qmake: FORCE
 	@$(QMAKE) -o Makefile ../../SmartAgriculture.pro -spec win32-g++ CONFIG+=debug CONFIG+=qml_debug
 
@@ -665,7 +675,6 @@ all: debug-all release-all  FORCE
 clean: debug-clean release-clean  FORCE
 distclean: debug-distclean release-distclean  FORCE
 	-$(DEL_FILE) Makefile
-	-$(DEL_FILE) .qmake.stash
 
 debug-mocclean:
 	$(MAKE) -f $(MAKEFILE).Debug mocclean
